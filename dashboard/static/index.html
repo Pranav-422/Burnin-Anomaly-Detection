@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Burn-In Screening Dashboard — ISRO QA Division</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=inter:wght@100..900&family=spaceGrotesk:wght@100..900&display=swap" rel="stylesheet"/>
+<style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}.loading-spinner{display:inline-block;width:20px;height:20px;border:3px solid #e5eeff;border-top:3px solid #fc8121;border-radius:50%;animation:spin 0.8s linear infinite;}@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}.fade-in{animation:fadeIn 0.3s ease-in-out;}@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}</style>
+<script src="https://cdn.tailwindcss.com"></script>
+<script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"inverse-on-surface":"#eaf1ff","on-error-container":"#93000a","error":"#ba1a1a","tertiary":"#002740","on-primary-fixed-variant":"#1d496f","secondary-container":"#fc8121","primary-container":"#0a3d62","surface-tint":"#386188","background":"#f8f9ff","primary-fixed":"#cfe5ff","secondary-fixed-dim":"#ffb68a","secondary":"#984700","inverse-surface":"#213145","on-error":"#ffffff","outline":"#72777f","on-primary-fixed":"#001d34","on-tertiary-container":"#4dacf1","tertiary-fixed":"#cce5ff","surface-variant":"#d3e4fe","surface-container-lowest":"#ffffff","on-tertiary-fixed-variant":"#004b73","on-surface-variant":"#42474e","tertiary-container":"#003e61","primary":"#002743","surface-container":"#e5eeff","tertiary-fixed-dim":"#93ccff","on-tertiary-fixed":"#001d31","on-surface":"#0b1c30","surface-dim":"#cbdbf5","on-tertiary":"#ffffff","secondary-fixed":"#ffdbc8","inverse-primary":"#a2caf7","surface":"#f8f9ff","on-secondary-fixed":"#321300","on-background":"#0b1c30","on-primary":"#ffffff","on-secondary-container":"#5f2a00","surface-container-high":"#dce9ff","on-secondary":"#ffffff","on-secondary-fixed-variant":"#743500","outline-variant":"#c2c7cf","on-primary-container":"#80a8d3","primary-fixed-dim":"#a2caf7","surface-bright":"#f8f9ff","surface-container-highest":"#d3e4fe","surface-container-low":"#eff4ff","error-container":"#ffdad6"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-xl":"2rem","space-xs":"0.5rem","space-md":"1rem","space-2xl":"3rem","gutter-desktop":"1.5rem","space-3xl":"4rem","container-max":"1280px","gutter-mobile":"1rem","space-lg":"1.5rem","space-sm":"0.75rem","space-2xs":"0.25rem"},"fontFamily":{"display":["spaceGrotesk"],"body-lg":["inter"],"body-sm":["inter"],"headline-md":["spaceGrotesk"],"headline-lg":["spaceGrotesk"],"title":["inter"],"headline-sm":["spaceGrotesk"],"body-md":["inter"],"label-md":["spaceGrotesk"],"label-lg":["spaceGrotesk"],"telemetry-mono":["spaceGrotesk"],"metric-display":["spaceGrotesk"],"headline-lg-mobile":["spaceGrotesk"]},"fontSize":{"display":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-lg":["16px",{"lineHeight":"26px","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"18px","fontWeight":"400"}],"headline-md":["24px",{"lineHeight":"32px","fontWeight":"600"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"700"}],"title":["18px",{"lineHeight":"26px","fontWeight":"600"}],"headline-sm":["20px",{"lineHeight":"28px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"22px","fontWeight":"400"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"600"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.02em","fontWeight":"600"}],"telemetry-mono":["13px",{"lineHeight":"18px","letterSpacing":"0.04em","fontWeight":"500"}],"metric-display":["36px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"700"}],"headline-lg-mobile":["26px",{"lineHeight":"32px","fontWeight":"700"}]}}}}</script>
+</head>
+<body class="bg-surface font-body-md text-on-surface">
+
+<!-- ==================== HEADER ==================== -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-primary-container shadow-[0_1px_8px_rgba(10,61,98,0.12)]">
+<div class="h-20 w-full px-gutter-desktop flex items-center justify-between">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest/10 flex items-center justify-center p-space-2xs">
+<span class="material-symbols-outlined text-secondary-container text-[24px]">rocket_launch</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm">
+<span class="font-headline-sm text-headline-sm text-on-primary">Burn-In Screening Dashboard</span>
+<span class="px-space-xs py-space-2xs rounded-full bg-secondary-container/20 text-secondary-container font-label-md text-label-md uppercase tracking-wider">ISRO QA Division</span>
+</div>
+<span class="font-label-md text-label-md text-on-primary-container tracking-wider uppercase">Government of India // Department of Space</span>
+</div>
+</div>
+<div class="flex items-center gap-space-lg">
+<div class="flex items-center gap-space-xs px-space-sm py-space-2xs rounded-full bg-primary/40">
+<span class="w-2 h-2 rounded-full bg-secondary-container animate-ping"></span>
+<span class="font-telemetry-mono text-telemetry-mono text-on-primary">TELEMETRY ONLINE // <span id="latencyMs">12</span>ms</span>
+</div>
+<button onclick="exportReport()" class="flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-secondary text-on-secondary font-label-md text-label-md hover:bg-on-secondary-container transition-colors shadow-[0_1px_3px_rgba(10,61,98,0.08)]">
+<span class="material-symbols-outlined text-[18px]">download</span><span>Export</span>
+</button>
+<div class="flex items-center gap-space-sm pl-space-md border-l border-on-primary-container/20">
+<div class="text-right hidden sm:block">
+<span class="block font-telemetry-mono text-telemetry-mono text-on-primary">QA-ENGR-8491</span>
+<span class="block font-label-md text-label-md text-on-primary-container">Level 4 Inspector</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-inner">
+<span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+
+<!-- ==================== SIDEBAR ==================== -->
+<aside class="fixed left-0 top-20 bottom-0 w-64 bg-surface-container-lowest shadow-[0_1px_8px_rgba(10,61,98,0.04)] z-40 flex flex-col pt-space-lg pb-space-lg">
+<div class="px-space-lg mb-space-md">
+<span class="font-label-md text-label-md uppercase text-outline tracking-wider">Operational Units</span>
+</div>
+<nav class="flex-1 px-space-xs flex flex-col gap-space-2xs" id="sidebarNav">
+<a class="nav-link flex items-center px-space-md py-space-sm rounded-lg transition-all" data-page="overview" href="#overview" onclick="navigate('overview')">
+<span class="material-symbols-outlined mr-space-sm text-[20px]">grid_view</span>
+<span class="font-label-lg text-label-lg">Overview</span>
+</a>
+<a class="nav-link flex items-center px-space-md py-space-sm rounded-lg transition-all" data-page="lot-explorer" href="#lot-explorer" onclick="navigate('lot-explorer')">
+<span class="material-symbols-outlined mr-space-sm text-[20px]">inventory_2</span>
+<span class="font-label-lg text-label-lg">Lot Explorer</span>
+</a>
+<a class="nav-link flex items-center px-space-md py-space-sm rounded-lg transition-all" data-page="component-drilldown" href="#component-drilldown" onclick="navigate('component-drilldown')">
+<span class="material-symbols-outlined mr-space-sm text-[20px]">memory</span>
+<span class="font-label-lg text-label-lg">Component Drill-down</span>
+</a>
+<a class="nav-link flex items-center px-space-md py-space-sm rounded-lg transition-all" data-page="live-predictor" href="#live-predictor" onclick="navigate('live-predictor')">
+<span class="material-symbols-outlined mr-space-sm text-[20px]">vital_signs</span>
+<span class="font-label-lg text-label-lg">Live Predictor</span>
+</a>
+</nav>
+<div class="px-space-md pt-space-md border-t border-surface-container-high">
+<div class="p-space-sm rounded-lg bg-surface-container-low flex flex-col gap-space-2xs">
+<span class="font-label-md text-label-md text-outline uppercase">Chamber Facility</span>
+<span class="font-telemetry-mono text-telemetry-mono text-primary font-bold">ISITE-CH-04</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Atm: 125°C // Dynamic Bias</span>
+</div>
+</div>
+</aside>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<div class="pl-64">
+<main class="w-full min-h-screen pt-20 bg-surface px-gutter-desktop py-space-xl">
+<div id="pageContent" class="flex flex-col w-full gap-space-lg">
+<div class="flex items-center justify-center h-64"><div class="loading-spinner"></div><span class="ml-4 text-outline">Loading dashboard data…</span></div>
+</div>
+</main>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="pl-64">
+<div class="flex flex-col sm:flex-row items-center justify-between gap-space-xs py-space-sm px-gutter-desktop rounded-lg bg-surface-container-low text-on-surface-variant font-body-sm text-body-sm mx-gutter-desktop mb-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px] text-primary">account_balance</span>
+<span>Institutional compliance: Government of India // ISRO Satellite Centre (URSC) Bengaluru</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="font-telemetry-mono text-telemetry-mono">QA-REF: ISRO/URSC/QA-QMS-4402</span>
+<span class="text-outline-variant">•</span>
+<span class="font-telemetry-mono text-telemetry-mono">ISO 9001:2015 AS9100D</span>
+</div>
+</div>
+</div>
+
+<script>
+// ==================== CONFIG & STATE ====================
+const API_BASE = window.location.origin;
+let state = {
+  currentPage: 'overview',
+  overview: null,
+  lots: null,
+  selectedLot: null,
+  scatterData: null,
+  lotComponents: null,
+  flaggedComponents: null,
+  selectedComponent: null,
+  componentDetail: null,
+  predictorResult: null,
+  lotPage: 1,
+};
+
+// ==================== API HELPERS ====================
+async function api(path) {
+  const t0 = performance.now();
+  const res = await fetch(`${API_BASE}${path}`);
+  const ms = Math.round(performance.now() - t0);
+  document.getElementById('latencyMs').textContent = ms;
+  if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
+  return res.json();
+}
+
+async function apiPost(path, body) {
+  const t0 = performance.now();
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
+  });
+  const ms = Math.round(performance.now() - t0);
+  document.getElementById('latencyMs').textContent = ms;
+  if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
+  return res.json();
+}
+
+function fmt(n, d=2) { return n != null ? Number(n).toFixed(d) : '—'; }
+function fmtInt(n) { return n != null ? Number(n).toLocaleString() : '—'; }
+function pct(n) { return n != null ? (n * 100).toFixed(1) + '%' : '—'; }
+
+function formatDiagnosticExplanation(text) {
+  if (!text) return '<p class="text-[15px] text-on-surface-variant italic">No diagnostic telemetry available.</p>';
+  
+  // Extract modules / points matching [Module ...] or [Param ...]
+  const matches = text.match(/\[[^\]]+\][^[]+/g);
+  
+  if (matches && matches.length > 0) {
+    return `<ul class="flex flex-col gap-space-sm mt-space-md w-full">` + matches.map(item => {
+      const tagMatch = item.match(/^(\[[^\]]+\])\s*(.*)/);
+      if (tagMatch) {
+        const tag = tagMatch[1];
+        let body = tagMatch[2].trim().replace(/^["']|["']$/g, '');
+        const isModuleB = tag.toLowerCase().includes('module b');
+        const isModuleA = tag.toLowerCase().includes('module a');
+        const badgeColor = isModuleB 
+          ? 'bg-secondary-container/25 text-secondary-container border border-secondary-container/40' 
+          : (isModuleA ? 'bg-error/15 text-error border border-error/30' : 'bg-surface-container-high text-primary');
+        const iconName = isModuleB ? 'trending_up' : (isModuleA ? 'warning' : 'info');
+        const iconColor = isModuleB ? 'text-secondary-container bg-secondary-container/15' : 'text-error bg-error/15';
+        
+        return `
+          <li class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-lowest/90 border border-outline-variant/40 shadow-[0_1px_2px_rgba(10,61,98,0.04)] hover:border-secondary/50 transition-all">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg ${iconColor} shrink-0 mt-0.5 font-bold shadow-sm">
+              <span class="material-symbols-outlined text-[18px]">${iconName}</span>
+            </span>
+            <div class="flex-1 text-[15.5px] leading-relaxed text-on-surface">
+              <span class="inline-block font-telemetry-mono text-[12.5px] font-bold px-2.5 py-1 rounded-md mr-2.5 mb-1 ${badgeColor}">${tag}</span>
+              <span class="font-normal text-on-surface/90">${body}</span>
+            </div>
+          </li>`;
+      } else {
+        return `
+          <li class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-lowest/90 border border-outline-variant/40 shadow-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-secondary shrink-0 mt-2"></span>
+            <span class="text-[15.5px] leading-relaxed text-on-surface">${item.trim()}</span>
+          </li>`;
+      }
+    }).join('') + `</ul>`;
+  }
+  
+  // Fallback: split by sentence
+  const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
+  if (sentences.length > 1) {
+    return `<ul class="flex flex-col gap-space-sm mt-space-md w-full">` + sentences.map(s => `
+      <li class="flex items-start gap-space-md p-space-md rounded-xl bg-surface-container-lowest/90 border border-outline-variant/40 shadow-sm">
+        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-secondary/15 text-secondary shrink-0 mt-0.5">
+          <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+        </span>
+        <span class="text-[15.5px] leading-relaxed text-on-surface">${s.trim().replace(/^["']|["']$/g, '')}</span>
+      </li>
+    `).join('') + `</ul>`;
+  }
+
+  return `<div class="p-space-md rounded-xl bg-surface-container-lowest/90 border border-outline-variant/40 shadow-sm mt-space-md"><p class="text-[15.5px] leading-relaxed text-on-surface">${text.replace(/^["']|["']$/g, '')}</p></div>`;
+}
+
+// ==================== NAVIGATION ====================
+function navigate(page) {
+  state.currentPage = page;
+  window.location.hash = page;
+  updateNav();
+  renderPage();
+}
+
+function updateNav() {
+  document.querySelectorAll('.nav-link').forEach(link => {
+    const isActive = link.dataset.page === state.currentPage;
+    link.className = `nav-link flex items-center px-space-md py-space-sm rounded-lg transition-all ${
+      isActive
+        ? 'bg-surface-container-low text-secondary font-bold border-l-4 border-secondary'
+        : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
+    }`;
+    if (isActive) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+}
+
+// ==================== PAGE RENDERERS ====================
+
+async function renderPage() {
+  const content = document.getElementById('pageContent');
+  content.innerHTML = '<div class="flex items-center justify-center h-64"><div class="loading-spinner"></div><span class="ml-4 text-outline">Loading…</span></div>';
+
+  try {
+    switch (state.currentPage) {
+      case 'overview': await renderOverview(); break;
+      case 'lot-explorer': await renderLotExplorer(); break;
+      case 'component-drilldown': await renderComponentDrilldown(); break;
+      case 'live-predictor': await renderLivePredictor(); break;
+      default: await renderOverview();
+    }
+  } catch (err) {
+    content.innerHTML = `<div class="p-space-xl text-center">
+      <span class="material-symbols-outlined text-error text-[48px]">error</span>
+      <p class="font-headline-sm text-headline-sm text-error mt-space-md">Connection Error</p>
+      <p class="font-body-md text-body-md text-on-surface-variant mt-space-xs">${err.message}</p>
+      <p class="font-body-sm text-body-sm text-outline mt-space-sm">Make sure the API server is running: <code class="bg-surface-container px-2 py-1 rounded">uvicorn api.main:app --port 8000</code></p>
+      <button onclick="renderPage()" class="mt-space-md px-space-lg py-space-sm bg-secondary text-on-secondary rounded-lg font-label-lg">Retry</button>
+    </div>`;
+  }
+}
+
+// ==================== 1. OVERVIEW DASHBOARD ====================
+async function renderOverview() {
+  if (!state.overview) state.overview = await api('/api/overview');
+  if (!state.lots) state.lots = await api('/api/lots');
+  const o = state.overview;
+  const lots = state.lots;
+
+  const content = document.getElementById('pageContent');
+  content.innerHTML = `
+  <div class="fade-in flex flex-col w-full gap-space-lg">
+    <!-- Executive Telemetry Header -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md p-space-lg rounded-xl bg-surface-container-lowest shadow-[0_1px_3px_rgba(10,61,98,0.04)]">
+      <div class="flex flex-col gap-space-2xs">
+        <div class="flex items-center gap-space-sm flex-wrap">
+          <span class="font-headline-md text-headline-md text-primary tracking-tight">Executive Telemetry</span>
+          <span class="px-space-xs py-space-2xs rounded-full bg-secondary-fixed text-on-secondary-fixed font-telemetry-mono text-telemetry-mono uppercase">Batch Live</span>
+          <span class="px-space-xs py-space-2xs rounded-full bg-surface-container text-on-surface-variant font-telemetry-mono text-telemetry-mono">ISITE Chamber #04</span>
+        </div>
+        <div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm">
+          <span class="material-symbols-outlined text-[16px] text-secondary">tune</span>
+          <span>Standard Cycle:</span>
+          <span class="font-telemetry-mono text-telemetry-mono font-bold text-primary">MIL-STD-883K Class-S</span>
+          <span class="text-outline-variant">•</span>
+          <span class="font-telemetry-mono text-telemetry-mono text-primary">168h Stress @ 125°C Dynamic Bias</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-space-sm self-start lg:self-center">
+        <button class="flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">history</span><span>Run Logs</span>
+        </button>
+        <button onclick="exportReport()" class="flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-secondary text-on-secondary font-label-md text-label-md hover:bg-on-secondary-container transition-all shadow-md">
+          <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span><span>Export QA Report</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-space-md">
+      ${kpiCard('Total Tested', fmtInt(o.total_tested), 'memory', '#fc8121', `+${fmtInt(o.total_tested)} from all lots`, 'trending_up', '#fc8121')}
+      ${kpiCard('Flagged Outliers', fmtInt(o.flagged_outliers), 'warning', '#ba1a1a', `${o.drift_rate_pct}% drift rate`, 'trending_up', '#ba1a1a', true, 'Quarantine')}
+      ${kpiCard('Recall Rate', pct(o.recall_rate), 'verified', '#0a3d62', 'Tgt 99.0%', null, null, false, 'Flight Class-S')}
+      ${kpiCard('False Negatives', fmtInt(o.false_negatives), 'check_circle', '#386188', `< 0.005% (In Spec)`, null, '#fc8121')}
+      ${kpiCard('False Positives', fmtInt(o.false_positives), 'fact_check', '#984700', `${fmt(o.false_positives / o.total_tested * 100, 2)}%`, null, '#984700', false, 'Re-screen Queue')}
+    </div>
+
+    <!-- Yield + Mission Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+      <!-- Yield Donut -->
+      <div class="lg:col-span-5 p-space-lg rounded-xl bg-surface-container-lowest shadow-[0_1px_3px_rgba(10,61,98,0.04)] flex flex-col justify-between">
+        <div class="flex items-center justify-between pb-space-sm">
+          <div class="flex flex-col">
+            <span class="font-title text-title text-primary">Yield Breakdown & Qualification</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">Cumulative across current 168h thermal run</span>
+          </div>
+          <span class="material-symbols-outlined text-outline">pie_chart</span>
+        </div>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-space-lg py-space-md">
+          <div class="relative w-44 h-44 flex items-center justify-center">
+            ${renderDonut(o.yield_pct)}
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span class="font-display text-headline-lg text-primary tracking-tight leading-none">${o.yield_pct}%</span>
+              <span class="font-label-md text-label-md text-outline uppercase tracking-wider mt-1">Net Pass</span>
+            </div>
+          </div>
+          <div class="flex flex-col gap-space-sm w-full sm:w-auto">
+            <div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between gap-space-md min-w-[190px]">
+              <div class="flex items-center gap-space-xs">
+                <span class="w-3 h-3 rounded-full bg-primary-container"></span>
+                <div class="flex flex-col">
+                  <span class="font-label-lg text-label-lg text-primary font-bold">Pass / Space-Ready</span>
+                  <span class="font-body-sm text-body-sm text-on-surface-variant">Class-S Flight Grade</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="block font-telemetry-mono text-telemetry-mono font-bold text-primary">${fmtInt(o.passed)}</span>
+                <span class="block font-label-md text-[11px] text-outline">${o.yield_pct}%</span>
+              </div>
+            </div>
+            <div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between gap-space-md min-w-[190px]">
+              <div class="flex items-center gap-space-xs">
+                <span class="w-3 h-3 rounded-full bg-secondary-container"></span>
+                <div class="flex flex-col">
+                  <span class="font-label-lg text-label-lg text-secondary font-bold">Flagged Drift</span>
+                  <span class="font-body-sm text-body-sm text-on-surface-variant">Quarantine Depot</span>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="block font-telemetry-mono text-telemetry-mono font-bold text-error">${fmtInt(o.flagged_outliers)}</span>
+                <span class="block font-label-md text-[11px] text-outline">${o.drift_rate_pct}%</span>
+              </div>
+            </div>
+            <!-- Workflow Image Pop-out Button -->
+            <button onclick="openWorkflowModal()" class="w-full flex items-center justify-center gap-2 px-space-md py-2.5 rounded-lg bg-secondary/15 hover:bg-secondary/25 text-secondary border border-secondary/40 hover:border-secondary transition-all font-label-md text-[13px] font-bold shadow-sm group">
+              <span class="material-symbols-outlined text-[19px] text-secondary group-hover:scale-110 transition-transform">schema</span>
+              <span>View Screening Workflow</span>
+            </button>
+          </div>
+        </div>
+        <div class="flex items-center justify-between pt-space-sm bg-surface-container-low px-space-md py-space-xs rounded-lg">
+          <span class="font-body-sm text-body-sm text-on-surface-variant">Verification Threshold Margin:</span>
+          <span class="font-telemetry-mono text-telemetry-mono text-primary font-bold">+4.12σ Delta IDDQ</span>
+        </div>
+      </div>
+
+      <!-- Mission Allocation -->
+      <div class="lg:col-span-7 p-space-lg rounded-xl bg-surface-container-lowest shadow-[0_1px_3px_rgba(10,61,98,0.04)] flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="font-title text-title text-primary">Active Mission Allocation & Traceability</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">Downstream subsystem assignment for screened batch</span>
+          </div>
+          <span class="px-space-sm py-space-2xs rounded-full bg-primary text-on-primary font-telemetry-mono text-telemetry-mono">FLIGHT ALLOCATED</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-space-md my-space-md">
+          <div class="relative overflow-hidden rounded-xl bg-surface-container-high/60 p-space-md flex flex-col justify-between h-44">
+            <div class="relative z-10 flex flex-col">
+              <span class="font-label-md text-label-md uppercase text-secondary font-bold">Payload Target</span>
+              <span class="font-headline-sm text-headline-sm text-primary tracking-tight mt-space-2xs">Gaganyaan-03</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Crew Module Avionics (OBC-Quad-V)</span>
+            </div>
+            <div class="relative z-10 flex items-center gap-space-2xs">
+              <span class="material-symbols-outlined text-[16px] text-secondary">verified_user</span>
+              <span class="font-telemetry-mono text-telemetry-mono text-primary font-bold">URSC Pinpoint</span>
+            </div>
+          </div>
+          <div class="rounded-xl bg-surface-container-low p-space-md flex flex-col justify-between h-44">
+            <div class="flex flex-col">
+              <span class="font-label-md text-label-md uppercase text-outline">Flight Volume</span>
+              <span class="font-metric-display text-headline-lg text-primary font-bold mt-space-2xs">${fmtInt(o.passed)}</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant">Qualified Components Allocated</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="font-label-md text-label-md text-outline">Packaging:</span>
+              <span class="font-telemetry-mono text-telemetry-mono text-primary font-bold">CQFP-256 Ceramic</span>
+            </div>
+          </div>
+          <div class="rounded-xl bg-surface-container-low p-space-md flex flex-col justify-between h-44">
+            <div class="flex flex-col">
+              <span class="font-label-md text-label-md uppercase text-outline">Radiation Hardening</span>
+              <div class="flex items-baseline gap-space-2xs mt-space-2xs">
+                <span class="font-metric-display text-headline-lg text-secondary font-bold">>100</span>
+                <span class="font-label-lg text-label-lg text-primary">krad(Si)</span>
+              </div>
+              <span class="font-body-sm text-body-sm text-on-surface-variant">TID & SEL Immune (>75 MeV)</span>
+            </div>
+            <div class="flex items-center gap-space-2xs">
+              <span class="w-2 h-2 rounded-full bg-secondary"></span>
+              <span class="font-telemetry-mono text-telemetry-mono text-primary">TID Phase-IV Compliant</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-space-sm p-space-sm rounded-lg bg-surface-container">
+          <div class="flex items-center gap-space-sm">
+            <span class="material-symbols-outlined text-primary text-[20px]">assignment_turned_in</span>
+            <span class="font-body-sm text-body-sm text-primary font-semibold">Subsystem Sign-off: Avionics Group (URSC-AVN-2026-904)</span>
+          </div>
+          <div class="flex items-center gap-space-xs">
+            <span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant">Release Code:</span>
+            <span class="font-telemetry-mono text-telemetry-mono font-bold text-secondary">G3-AVN-REL-OK</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lots Table -->
+    <div class="rounded-xl bg-surface-container-lowest shadow-[0_1px_3px_rgba(10,61,98,0.04)] overflow-hidden">
+      <div class="px-space-lg py-space-md flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+        <div class="flex items-center gap-space-sm">
+          <span class="font-headline-sm text-headline-sm text-primary">Active Manufacturing Lots Summary</span>
+          <span class="px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface-variant font-telemetry-mono text-telemetry-mono">${lots.length} Lots Monitoring</span>
+        </div>
+      </div>
+      <div class="w-full overflow-x-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="bg-primary text-on-primary">
+              <th class="px-space-lg py-space-sm font-label-md text-label-md uppercase tracking-wider">Lot Identifier</th>
+              <th class="px-space-md py-space-sm font-label-md text-label-md uppercase tracking-wider text-right">Component Units</th>
+              <th class="px-space-md py-space-sm font-label-md text-label-md uppercase tracking-wider text-right">Flagged</th>
+              <th class="px-space-md py-space-sm font-label-md text-label-md uppercase tracking-wider">Status & Drift</th>
+              <th class="px-space-md py-space-sm font-label-md text-label-md uppercase tracking-wider">0h → 168h Drift Curve</th>
+              <th class="px-space-lg py-space-sm font-label-md text-label-md uppercase tracking-wider text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-surface-container">
+            ${lots.map(lot => `
+            <tr class="hover:bg-surface-container-low transition-colors">
+              <td class="px-space-lg py-space-sm font-telemetry-mono text-telemetry-mono font-bold text-primary">${lot.lot_id}</td>
+              <td class="px-space-md py-space-sm font-telemetry-mono text-telemetry-mono text-right text-primary font-bold">${fmtInt(lot.n_components)}</td>
+              <td class="px-space-md py-space-sm font-telemetry-mono text-telemetry-mono text-right ${lot.n_flagged > 0 ? 'text-error font-bold' : 'text-primary'}">${lot.n_flagged}</td>
+              <td class="px-space-md py-space-sm">
+                <div class="inline-flex items-center gap-space-2xs px-space-xs py-1 rounded-full ${lot.status === 'High Drift' ? 'bg-error-container text-on-error-container font-bold' : 'bg-surface-container text-primary'} font-label-md text-label-md">
+                  <span class="w-1.5 h-1.5 rounded-full ${lot.status === 'High Drift' ? 'bg-error' : 'bg-secondary'}"></span>
+                  <span>${lot.status} (${lot.drift_pct}%)</span>
+                </div>
+              </td>
+              <td class="px-space-md py-space-sm">
+                <div class="w-32 h-7 flex items-center">${renderSparkline(lot.sparkline, lot.status === 'High Drift')}</div>
+              </td>
+              <td class="px-space-lg py-space-sm text-right">
+                <button onclick="state.selectedLot='${lot.lot_id}';navigate('lot-explorer')" class="font-label-md text-label-md ${lot.status === 'High Drift' ? 'text-error hover:text-on-error-container' : 'text-primary hover:text-secondary'} underline transition-colors">${lot.status === 'High Drift' ? 'Quarantine Hold ›' : 'Inspect Lot ›'}</button>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ==================== 2. LOT EXPLORER ====================
+async function renderLotExplorer() {
+  if (!state.lots) state.lots = await api('/api/lots');
+  const lots = state.lots;
+  if (!state.selectedLot) state.selectedLot = lots[0]?.lot_id;
+  const lotId = state.selectedLot;
+  const scatterData = await api(`/api/lot/${lotId}/scatter?parameter=leakage_ua`);
+  const compData = await api(`/api/lot/${lotId}/components?parameter=leakage_ua&page=${state.lotPage}&page_size=6`);
+
+  const content = document.getElementById('pageContent');
+  content.innerHTML = `
+  <div class="fade-in flex flex-col w-full gap-space-lg">
+    <!-- Context Bar -->
+    <div class="w-full bg-primary-container rounded-lg p-space-md shadow-sm text-on-primary flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-space-md">
+      <div class="flex flex-wrap items-center gap-space-md">
+        <div class="flex items-center gap-space-xs">
+          <span class="material-symbols-outlined text-secondary-container text-[22px]">category</span>
+          <label class="font-label-md text-label-md text-on-primary-container tracking-wider uppercase">Active Lot Identifier</label>
+        </div>
+        <div class="relative min-w-[320px]">
+          <select id="lotSelector" onchange="state.selectedLot=this.value;state.lotPage=1;renderLotExplorer()" class="w-full bg-surface-container-lowest text-on-surface font-title text-body-md rounded-lg py-space-xs pl-space-md pr-space-xl appearance-none shadow-sm focus:outline-none cursor-pointer">
+            ${lots.map(l => `<option value="${l.lot_id}" ${l.lot_id === lotId ? 'selected' : ''}>${l.lot_id} (${l.n_components} Units)</option>`).join('')}
+          </select>
+          <span class="material-symbols-outlined absolute right-space-sm top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-space-sm">
+        <div class="flex items-center gap-space-xs px-space-md py-space-2xs rounded-full bg-surface-container-lowest/10 shadow-inner">
+          <span class="material-symbols-outlined text-on-tertiary-container text-[16px]">speed</span>
+          <span class="font-label-md text-label-md text-on-primary-container uppercase">Avg 168h:</span>
+          <span class="font-telemetry-mono text-telemetry-mono text-on-primary font-bold">${fmt(scatterData.lot_mean)} ${scatterData.unit}</span>
+        </div>
+        <div class="flex items-center gap-space-xs px-space-md py-space-2xs rounded-full bg-secondary-container/20 shadow-inner">
+          <span class="material-symbols-outlined text-secondary-container text-[16px]">verified</span>
+          <span class="font-label-md text-label-md text-secondary-fixed uppercase">Std Dev:</span>
+          <span class="font-headline-sm text-label-lg text-secondary-container font-bold">${fmt(scatterData.lot_std)}</span>
+        </div>
+        <div class="flex items-center gap-space-xs px-space-md py-space-2xs rounded-full bg-surface-container-lowest/10 shadow-inner">
+          <span class="material-symbols-outlined text-primary-fixed-dim text-[16px]">inventory</span>
+          <span class="font-label-md text-label-md text-on-primary-container uppercase">Tested:</span>
+          <span class="font-telemetry-mono text-telemetry-mono text-on-primary">${compData.total} Units</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scatter Chart -->
+    <div class="w-full bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-sm">
+        <div>
+          <div class="flex items-center gap-space-xs">
+            <span class="material-symbols-outlined text-primary text-[20px]">scatter_plot</span>
+            <h2 class="font-headline-sm text-headline-sm text-primary">168h Post-Screening ${scatterData.display_name} Scatter Distribution (${scatterData.unit})</h2>
+          </div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-space-2xs">Static HTOL burn-in test sequence chamber readings. Nominal limits evaluated against MIL-STD-883K threshold criteria.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-space-md bg-surface-container-low px-space-md py-space-xs rounded-lg">
+          <div class="flex items-center gap-space-xs"><span class="w-3 h-3 rounded-full bg-tertiary-container"></span><span class="font-label-md text-label-md text-on-surface-variant">Normal</span></div>
+          <div class="flex items-center gap-space-xs"><span class="w-3 h-3 rounded-full bg-secondary-container"></span><span class="font-label-md text-label-md text-on-surface-variant">Borderline</span></div>
+          <div class="flex items-center gap-space-xs"><span class="w-3 h-3 rounded-full bg-error"></span><span class="font-label-md text-label-md text-error font-bold">Anomalous</span></div>
+        </div>
+      </div>
+      <div class="relative w-full overflow-x-auto bg-surface-container-low rounded-lg p-space-2xs">
+        ${renderScatterSVG(scatterData)}
+      </div>
+    </div>
+
+    <!-- Components Table -->
+    <div class="rounded-xl bg-surface-container-lowest shadow-sm overflow-hidden">
+      <div class="px-space-lg py-space-md flex items-center justify-between">
+        <div class="flex items-center gap-space-sm">
+          <span class="material-symbols-outlined text-primary">table_chart</span>
+          <span class="font-headline-sm text-headline-sm text-primary">Component Readings</span>
+          <span class="px-space-xs py-0.5 rounded-full bg-surface-container text-on-surface-variant font-telemetry-mono text-telemetry-mono">Showing ${compData.components.length} of ${compData.total}</span>
+        </div>
+      </div>
+      <div class="w-full overflow-x-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="bg-primary text-on-primary">
+              <th class="px-space-lg py-space-sm font-label-md text-label-md uppercase tracking-wider">Component</th>
+              <th class="px-space-md py-space-sm font-label-md text-label-md uppercase tracking-wider text-right">0h</th>
+              <th class="px-space-md py-space-sm font-label-md text-label-md uppercase tracking-wider text-right">24h</th>
+              <th class="px-space-md py-space-sm font-label-md text-label-md uppercase tracking-wider text-right">96h</th>
+              <th class="px-space-md py-space-sm font-label-md text-label-md uppercase tracking-wider text-right">168h</th>
+              <th class="px-space-md py-space-sm font-label-md text-label-md uppercase tracking-wider text-right">Risk Score</th>
+              <th class="px-space-md py-space-sm font-label-md text-label-md uppercase tracking-wider">Status</th>
+              <th class="px-space-lg py-space-sm font-label-md text-label-md uppercase tracking-wider text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-surface-container">
+            ${compData.components.map(c => `
+            <tr class="hover:bg-surface-container-low transition-colors">
+              <td class="px-space-lg py-space-sm font-telemetry-mono text-telemetry-mono font-bold text-primary">${c.component_id}</td>
+              <td class="px-space-md py-space-sm font-telemetry-mono text-telemetry-mono text-right">${fmt(c.readings['0h'])}</td>
+              <td class="px-space-md py-space-sm font-telemetry-mono text-telemetry-mono text-right">${fmt(c.readings['24h'])}</td>
+              <td class="px-space-md py-space-sm font-telemetry-mono text-telemetry-mono text-right">${fmt(c.readings['96h'])}</td>
+              <td class="px-space-md py-space-sm font-telemetry-mono text-telemetry-mono text-right font-bold ${c.flagged ? 'text-error' : 'text-primary'}">${fmt(c.readings['168h'])}</td>
+              <td class="px-space-md py-space-sm font-telemetry-mono text-telemetry-mono text-right font-bold">${fmt(c.anomaly_score, 1)}</td>
+              <td class="px-space-md py-space-sm">
+                <span class="inline-flex items-center gap-1 px-space-xs py-0.5 rounded-full font-label-md text-label-md ${c.flagged ? 'bg-error-container text-on-error-container font-bold' : 'bg-surface-container text-primary'}">
+                  <span class="w-1.5 h-1.5 rounded-full ${c.flagged ? 'bg-error' : 'bg-secondary'}"></span>${c.status}
+                </span>
+              </td>
+              <td class="px-space-lg py-space-sm text-right">
+                <button onclick="state.selectedComponent='${c.component_id}';navigate('component-drilldown')" class="font-label-md text-label-md text-primary hover:text-secondary underline transition-colors">View Detail ›</button>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination -->
+      <div class="px-space-lg py-space-sm flex items-center justify-between bg-surface-container-low">
+        <span class="font-body-sm text-body-sm text-on-surface-variant">Page ${compData.page} of ${compData.total_pages}</span>
+        <div class="flex items-center gap-space-xs">
+          <button ${compData.page <= 1 ? 'disabled' : ''} onclick="state.lotPage=${compData.page-1};renderLotExplorer()" class="px-space-sm py-space-2xs rounded bg-surface-container text-primary font-label-md disabled:opacity-40">Previous</button>
+          <button ${compData.page >= compData.total_pages ? 'disabled' : ''} onclick="state.lotPage=${compData.page+1};renderLotExplorer()" class="px-space-sm py-space-2xs rounded bg-primary text-on-primary font-label-md disabled:opacity-40">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ==================== 3. COMPONENT DRILL-DOWN ====================
+async function renderComponentDrilldown() {
+  if (!state.lots) state.lots = await api('/api/lots');
+  if (!state.flaggedComponents) state.flaggedComponents = await api('/api/flagged?page_size=100');
+
+  const flagged = state.flaggedComponents.components;
+  if (!state.selectedComponent && flagged.length > 0) state.selectedComponent = flagged[0].component_id;
+
+  let detail = null;
+  if (state.selectedComponent) {
+    detail = await api(`/api/component/${state.selectedComponent}`);
+  }
+
+  const content = document.getElementById('pageContent');
+  if (!detail) {
+    content.innerHTML = '<div class="text-center py-16"><span class="material-symbols-outlined text-outline text-[48px]">search_off</span><p class="mt-4 text-outline">No flagged components found.</p></div>';
+    return;
+  }
+
+  const firstParam = Object.keys(detail.parameters)[0] || 'leakage_ua';
+  const pData = detail.parameters[firstParam];
+  const readings = pData?.readings || {};
+  const shapContribs = detail.shap_contributions?.[firstParam] || {};
+
+  content.innerHTML = `
+  <div class="fade-in flex flex-col w-full gap-space-lg">
+    <!-- Component Context Bar -->
+    <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-wrap items-center justify-between gap-space-md">
+      <div class="flex items-center gap-space-md min-w-0">
+        <div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-primary text-[24px]">memory</span>
+        </div>
+        <div class="flex flex-col min-w-0">
+          <div class="flex items-center gap-space-xs flex-wrap">
+            <select id="componentSelector" onchange="state.selectedComponent=this.value;renderComponentDrilldown()" class="font-telemetry-mono text-telemetry-mono font-bold text-primary bg-transparent border-b-2 border-secondary focus:outline-none cursor-pointer pr-6">
+              ${flagged.map(f => `<option value="${f.component_id}" ${f.component_id === state.selectedComponent ? 'selected' : ''}>${f.component_id}</option>`).join('')}
+            </select>
+            <span class="px-space-xs py-space-2xs rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md">Lot: ${detail.lot_id}</span>
+          </div>
+          <div class="flex items-center gap-space-sm font-body-sm text-body-sm text-on-surface-variant">
+            <span>Triggered: ${detail.triggered_parameters || 'N/A'}</span>
+            <span>•</span>
+            <span>Module A: ${detail.flag_module_a ? '✓' : '—'} | Module B: ${detail.flag_module_b ? '✓' : '—'}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Primary Split View -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+      <!-- Left: Risk Score + Parametric Data -->
+      <div class="lg:col-span-5 flex flex-col gap-space-lg">
+        <!-- Risk Score -->
+        <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md relative overflow-hidden">
+          <div class="flex items-center justify-between">
+            <span class="font-label-md text-label-md uppercase tracking-wider text-outline">Anomalous Drift Telemetry</span>
+            <div class="flex items-center gap-space-2xs px-space-sm py-space-2xs rounded-full ${detail.anomaly_score > 80 ? 'bg-error-container text-on-error-container' : detail.anomaly_score > 50 ? 'bg-secondary-fixed text-secondary' : 'bg-surface-container text-primary'} font-label-md text-label-md">
+              <span class="material-symbols-outlined text-[14px]">${detail.anomaly_score > 80 ? 'warning' : 'info'}</span>
+              <span>${detail.anomaly_score > 80 ? 'Critical Outlier' : detail.anomaly_score > 50 ? 'Warning' : 'Nominal'}</span>
+            </div>
+          </div>
+          <div class="flex items-baseline justify-between pt-space-xs">
+            <div class="flex items-baseline gap-space-2xs">
+              <span class="font-display text-display ${detail.anomaly_score > 80 ? 'text-secondary-container' : 'text-primary'} leading-none">${fmt(detail.anomaly_score, 1)}</span>
+              <span class="font-title text-title text-outline">/ 100</span>
+            </div>
+            <div class="text-right">
+              <span class="block font-label-md text-label-md uppercase text-outline">Risk Vector</span>
+              <span class="font-telemetry-mono text-telemetry-mono ${detail.flagged ? 'text-error' : 'text-primary'} font-bold">${detail.flagged ? 'REJECT MANDATE' : 'PASS — NOMINAL'}</span>
+            </div>
+          </div>
+          <!-- Gauge -->
+          <div class="flex flex-col gap-space-2xs">
+            <div class="relative h-3 w-full rounded-full bg-surface-container-high overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-r from-surface-tint via-secondary-container to-error opacity-90"></div>
+              <div class="absolute top-0 bottom-0 w-1.5 bg-surface-container-lowest shadow-md" style="left: ${Math.min(detail.anomaly_score, 100)}%; transform: translateX(-50%);"></div>
+            </div>
+            <div class="flex justify-between font-telemetry-mono text-body-sm text-outline px-space-2xs">
+              <span>Nominal (0)</span><span>Warning (50)</span><span>Reject (85+)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parametric Data -->
+        <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col gap-space-md">
+          <div class="flex items-center justify-between pb-space-2xs">
+            <span class="font-label-lg text-label-lg text-primary uppercase tracking-wider font-bold">Parametric Screening Data</span>
+            <span class="font-telemetry-mono text-telemetry-mono text-secondary">CHAMBER: 125°C HTOL</span>
+          </div>
+          <div class="flex flex-col gap-space-sm">
+            <div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-low">
+              <span class="font-body-md text-body-md text-on-surface-variant">Lot Sequence ID</span>
+              <span class="font-telemetry-mono text-telemetry-mono font-bold text-on-surface">${detail.lot_id}</span>
+            </div>
+            <div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-low">
+              <span class="font-body-md text-body-md text-on-surface-variant">0h Pre-Burn Baseline</span>
+              <span class="font-telemetry-mono text-telemetry-mono font-bold text-on-surface">${fmt(readings['0h'])} ${pData.unit}</span>
+            </div>
+            <div class="flex items-center justify-between p-space-sm rounded-lg ${detail.flagged ? 'bg-error-container/40' : 'bg-surface-container-low'}">
+              <div class="flex flex-col">
+                <span class="font-body-md text-body-md font-bold ${detail.flagged ? 'text-error' : 'text-primary'}">Measured 168h Value</span>
+                ${detail.flagged ? '<span class="font-body-sm text-body-sm text-on-error-container">Exceeds spec threshold</span>' : ''}
+              </div>
+              <span class="font-metric-display text-metric-display ${detail.flagged ? 'text-error' : 'text-primary'} font-bold leading-none">${fmt(readings['168h'])} ${pData.unit}</span>
+            </div>
+            <div class="flex items-center justify-between p-space-sm rounded-lg bg-secondary-container/15">
+              <div class="flex flex-col">
+                <span class="font-body-md text-body-md font-bold text-secondary">AI-Predicted 168h Value</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant">Projected at 24h cycle mark</span>
+              </div>
+              <span class="font-headline-md text-headline-md text-secondary-container font-bold leading-none">${fmt(pData.predicted_168h)} ${pData.unit}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Drift Curve Chart -->
+      <div class="lg:col-span-7 bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-space-sm mb-space-md">
+          <div>
+            <span class="font-label-md text-label-md uppercase tracking-wider text-outline block">Vector Plot Chamber Screening</span>
+            <h2 class="font-headline-sm text-headline-sm text-primary">${pData.display_name} Drift Vector [0h — 168h]</h2>
+          </div>
+          <div class="flex items-center gap-space-sm bg-surface-container p-space-2xs rounded-lg text-body-sm">
+            <div class="flex items-center gap-space-2xs px-space-xs py-space-2xs"><span class="w-3 h-3 rounded-full bg-primary inline-block"></span><span class="font-label-md text-label-md text-primary">Measured Real</span></div>
+            <div class="flex items-center gap-space-2xs px-space-xs py-space-2xs"><span class="w-3 h-0.5 bg-secondary-container inline-block border-b-2 border-dashed border-secondary-container"></span><span class="font-label-md text-label-md text-secondary">AI Trajectory</span></div>
+          </div>
+        </div>
+        <div class="relative w-full h-[380px] bg-surface-container-low/40 rounded-lg p-space-md flex flex-col justify-between overflow-hidden">
+          ${renderDriftChart(readings, pData)}
+        </div>
+        <div class="flex items-center justify-between pt-space-md text-on-surface-variant font-body-sm text-body-sm">
+          <span class="flex items-center gap-space-2xs">
+            <span class="material-symbols-outlined text-[16px] text-secondary">model_training</span>
+            <span>Model: ISRO-XGBoost // Confidence Envelope: 98.6%</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diagnostic Card -->
+    <div class="bg-surface-container-low rounded-2xl p-space-xl shadow-sm relative overflow-hidden flex flex-col gap-space-md border border-outline-variant/30">
+      <div class="absolute left-0 top-0 bottom-0 w-2.5 bg-secondary-container"></div>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md pl-space-xs">
+        <div class="flex items-center gap-space-md">
+          <div class="w-12 h-12 rounded-xl bg-secondary-container/20 flex items-center justify-center shrink-0 shadow-sm">
+            <span class="material-symbols-outlined text-secondary text-[28px]">psychology_alt</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-headline-sm text-headline-sm text-primary font-bold">Diagnostic Rationale & Predictive Audit</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">Automated multi-parameter drift & statistical outlier telemetry</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-space-xs px-space-md py-1.5 rounded-full bg-surface-container-high/70 border border-outline-variant/30 font-telemetry-mono text-[13px] text-primary self-start sm:self-center">
+          <span class="w-2.5 h-2.5 rounded-full ${detail.flagged ? 'bg-error animate-pulse' : 'bg-secondary'}"></span>
+          <span class="font-bold">${detail.flagged ? 'ANOMALY DETECTED' : 'NOMINAL TRACE'}</span>
+        </div>
+      </div>
+      <div class="pl-space-xs w-full">
+        ${formatDiagnosticExplanation(detail.explanation)}
+      </div>
+    </div>
+
+    <!-- SHAP Contributions -->
+    ${Object.keys(shapContribs).length > 0 ? `
+    <div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm">
+      <span class="font-headline-sm text-headline-sm text-primary block mb-space-md">Top Predictive Contributors to 168h Drift</span>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-space-md">
+        ${Object.entries(shapContribs).sort((a,b) => Math.abs(b[1]) - Math.abs(a[1])).slice(0, 3).map(([feat, val]) => `
+        <div class="p-space-md rounded-lg bg-surface-container-low flex flex-col gap-space-xs">
+          <span class="font-label-lg text-label-lg text-primary">${feat.replace(/_/g, ' ')}</span>
+          <div class="flex items-center gap-space-sm">
+            <div class="flex-1 h-2 rounded-full bg-surface-container-high overflow-hidden">
+              <div class="h-full rounded-full ${val > 0 ? 'bg-error' : 'bg-primary'}" style="width: ${Math.min(Math.abs(val) * 100, 100)}%"></div>
+            </div>
+            <span class="font-telemetry-mono text-telemetry-mono font-bold ${val > 0 ? 'text-error' : 'text-primary'}">${val > 0 ? '+' : ''}${fmt(val, 3)} Impact</span>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- Action Buttons -->
+    <div class="flex flex-wrap items-center justify-center gap-space-md pb-space-lg">
+      <button class="flex items-center gap-space-xs px-space-xl py-space-sm rounded-lg ${detail.flagged ? 'bg-error text-on-error' : 'bg-primary text-on-primary'} font-label-lg text-label-lg shadow-md hover:opacity-90 transition-all">
+        <span class="material-symbols-outlined text-[20px]">${detail.flagged ? 'flag' : 'check_circle'}</span>
+        <span>${detail.flagged ? 'Flag for Manual Review' : 'Accept — No Action Needed'}</span>
+      </button>
+    </div>
+  </div>`;
+}
+
+// ==================== 4. LIVE PREDICTOR ====================
+async function renderLivePredictor() {
+  if (!state.lots) state.lots = await api('/api/lots');
+  const lots = state.lots;
+
+  const content = document.getElementById('pageContent');
+  content.innerHTML = `
+  <div class="fade-in flex flex-col w-full">
+    <!-- Sub-Header -->
+    <div class="mb-space-xl flex flex-col md:flex-row md:items-center justify-between gap-space-md pb-space-md">
+      <div class="flex flex-col">
+        <div class="flex items-center gap-space-xs text-secondary font-label-md text-label-md tracking-wider uppercase">
+          <span class="material-symbols-outlined text-[16px]">verified</span>
+          <span>Quality Assurance Protocol Dossier</span>
+        </div>
+        <h2 class="font-headline-lg text-headline-lg text-primary tracking-tight">Early Burn-In Risk Assessment Engine (T+24h)</h2>
+        <div class="flex items-center gap-space-sm mt-space-2xs text-on-surface-variant font-telemetry-mono text-telemetry-mono">
+          <span class="inline-flex items-center gap-1.5 px-space-xs py-space-2xs rounded bg-surface-container text-primary font-bold">
+            <span class="w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
+            XGBoost Predictor
+          </span>
+          <span class="text-outline-variant font-bold">//</span>
+          <span>MIL-STD-883K Method 1015 Condition D</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form + Results Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl mb-space-xl items-start">
+      <!-- Input Form -->
+      <div class="lg:col-span-5 bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg relative overflow-hidden">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-space-xs mb-space-2xs">
+              <span class="material-symbols-outlined text-secondary text-[20px]">tune</span>
+              <span class="font-headline-md text-headline-md text-primary">Inference Parameters</span>
+            </div>
+            <p class="font-body-md text-body-md text-on-surface-variant">Enter initial burn-in readings for early flight qualification prognosis.</p>
+          </div>
+        </div>
+        <form id="predictForm" onsubmit="event.preventDefault(); runLivePrediction();" class="flex flex-col gap-space-md">
+          <div class="flex flex-col gap-space-2xs">
+            <label class="font-label-lg text-label-lg text-on-surface">Flight Lot Assembly Identifier</label>
+            <div class="relative">
+              <select id="predLot" class="w-full bg-surface-container-low text-on-surface font-telemetry-mono text-telemetry-mono px-space-md py-space-sm rounded-lg appearance-none cursor-pointer focus:outline-none">
+                ${lots.map(l => `<option value="${l.lot_id}">${l.lot_id} (${l.n_components} units)</option>`).join('')}
+              </select>
+              <span class="material-symbols-outlined absolute right-space-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-[20px]">expand_more</span>
+            </div>
+          </div>
+          <div class="flex flex-col gap-space-2xs">
+            <label class="font-label-lg text-label-lg text-on-surface">Screening Parameter</label>
+            <div class="relative">
+              <select id="predParam" class="w-full bg-surface-container-low text-on-surface font-telemetry-mono text-telemetry-mono px-space-md py-space-sm rounded-lg appearance-none cursor-pointer focus:outline-none">
+                <option value="leakage_ua">Leakage Current (µA)</option>
+                <option value="iddq_ua">Iddq Standby Current (µA)</option>
+                <option value="prop_delay_ns">Propagation Delay (ns)</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-space-sm top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-[20px]">expand_more</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+            <div class="flex flex-col gap-space-2xs">
+              <label class="font-label-md text-label-md text-on-surface">Value at 0h Baseline</label>
+              <div class="relative">
+                <input id="predV0" type="number" step="0.1" value="10.0" class="w-full bg-surface-container-low text-primary font-telemetry-mono text-headline-sm font-bold px-space-md py-space-sm rounded-lg focus:outline-none focus:bg-surface-container-high transition-colors"/>
+              </div>
+            </div>
+            <div class="flex flex-col gap-space-2xs">
+              <label class="font-label-md text-label-md text-on-surface">Value at 24h Checkpoint</label>
+              <div class="relative">
+                <input id="predV24" type="number" step="0.1" value="12.0" class="w-full bg-surface-container-low text-primary font-telemetry-mono text-headline-sm font-bold px-space-md py-space-sm rounded-lg focus:outline-none focus:bg-surface-container-high transition-colors"/>
+              </div>
+            </div>
+          </div>
+          <button type="submit" id="predictBtn" class="w-full py-space-md px-space-lg rounded-lg bg-secondary text-on-secondary font-label-lg text-label-lg hover:bg-on-secondary-container active:scale-[0.99] transition-all flex items-center justify-center gap-space-xs shadow-md">
+            <span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+            <span class="tracking-wide">Predict Risk</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Results Panel -->
+      <div id="predResults" class="lg:col-span-7 bg-surface-container-lowest rounded-xl shadow-sm p-space-xl flex flex-col gap-space-lg relative overflow-hidden">
+        <div class="flex flex-col items-center justify-center py-16 text-center">
+          <span class="material-symbols-outlined text-outline text-[64px]">query_stats</span>
+          <p class="font-headline-sm text-headline-sm text-outline mt-space-md">Enter Parameters & Run Prediction</p>
+          <p class="font-body-md text-body-md text-on-surface-variant mt-space-xs">Results will appear here after inference.</p>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function runLivePrediction() {
+  const btn = document.getElementById('predictBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="loading-spinner"></div><span class="ml-2">Running inference…</span>';
+
+  try {
+    const result = await apiPost('/predict', {
+      component_id: 'LIVE_TEST_' + Date.now(),
+      lot_id: document.getElementById('predLot').value,
+      parameter: document.getElementById('predParam').value,
+      value_0h: parseFloat(document.getElementById('predV0').value),
+      value_24h: parseFloat(document.getElementById('predV24').value),
+    });
+
+    const isReject = result.recommendation.includes('REJECT');
+    const panel = document.getElementById('predResults');
+    panel.innerHTML = `
+    <div class="fade-in flex flex-col gap-space-lg">
+      <div class="flex items-center justify-between pb-space-sm">
+        <div class="flex items-center gap-space-xs">
+          <span class="w-3 h-3 rounded-full ${isReject ? 'bg-error' : 'bg-secondary'} animate-ping"></span>
+          <h3 class="font-headline-md text-headline-md text-primary">Prognostic Outcome & Verdict</h3>
+        </div>
+        <div class="flex items-center gap-space-xs bg-surface-container-high px-space-sm py-space-2xs rounded-full">
+          <span class="font-telemetry-mono text-body-sm text-primary font-bold">168-HOUR HORIZON</span>
+        </div>
+      </div>
+
+      <!-- Hero Metric -->
+      <div class="p-space-lg rounded-xl bg-surface-container-low flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+        <div class="flex flex-col">
+          <span class="font-label-md text-label-md uppercase text-outline tracking-wider">Estimated Value at T+168h</span>
+          <div class="flex items-baseline gap-space-xs">
+            <span class="font-display text-display font-bold ${isReject ? 'text-secondary-container' : 'text-primary'}">${fmt(result.predicted_168h)}</span>
+          </div>
+        </div>
+        <div class="flex flex-col md:items-end justify-center p-space-md rounded-lg bg-surface-container-lowest shadow-sm">
+          <span class="font-label-md text-label-md text-outline uppercase">Safety Slope Threshold</span>
+          <span class="font-telemetry-mono text-headline-sm font-bold text-primary">${fmt(result.safety_slope_threshold, 5)}</span>
+        </div>
+      </div>
+
+      <!-- Drift Rate -->
+      <div class="flex flex-col gap-space-xs">
+        <div class="flex justify-between items-baseline">
+          <span class="font-label-lg text-label-lg text-on-surface">Predicted Drift Slope</span>
+          <span class="font-telemetry-mono text-telemetry-mono font-bold ${isReject ? 'text-error' : 'text-primary'}">${fmt(result.predicted_slope, 5)} per hour</span>
+        </div>
+        <div class="relative w-full pt-6 pb-2">
+          <div class="h-3 w-full rounded-full overflow-hidden flex shadow-inner bg-surface-container-high">
+            <div class="h-full bg-emerald-600 flex-1"></div>
+            <div class="h-full bg-amber-500 w-1/4"></div>
+            <div class="h-full bg-error flex-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verdict -->
+      <div class="p-space-lg rounded-2xl ${isReject ? 'bg-error text-on-error' : 'bg-primary text-on-primary'} flex items-start gap-space-md shadow-md">
+        <div class="w-12 h-12 rounded-xl ${isReject ? 'bg-on-error/20' : 'bg-on-primary/20'} flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+          <span class="material-symbols-outlined text-[30px]">${isReject ? 'gpp_bad' : 'verified'}</span>
+        </div>
+        <div class="flex-1">
+          <span class="font-headline-sm text-headline-sm font-bold uppercase tracking-wide block">${result.recommendation}</span>
+          <p class="text-[15px] leading-relaxed opacity-95 mt-2">${result.explanation}</p>
+        </div>
+      </div>
+
+      <!-- Feature Contributions -->
+      ${Object.keys(result.feature_contributions).length > 0 ? `
+      <div class="p-space-md rounded-lg bg-surface-container">
+        <span class="font-label-lg text-label-lg text-primary block mb-space-sm">Feature Contributions</span>
+        <div class="flex flex-col gap-space-xs">
+          ${Object.entries(result.feature_contributions).sort((a,b) => Math.abs(b[1]) - Math.abs(a[1])).map(([f, v]) => `
+          <div class="flex items-center gap-space-sm">
+            <span class="font-telemetry-mono text-telemetry-mono text-on-surface-variant w-40 truncate">${f}</span>
+            <div class="flex-1 h-2 rounded-full bg-surface-container-high overflow-hidden">
+              <div class="h-full rounded-full ${v > 0 ? 'bg-error' : 'bg-primary'}" style="width: ${Math.min(Math.abs(v) * 200, 100)}%"></div>
+            </div>
+            <span class="font-telemetry-mono text-telemetry-mono font-bold w-20 text-right ${v > 0 ? 'text-error' : 'text-primary'}">${v > 0 ? '+' : ''}${fmt(v, 4)}</span>
+          </div>`).join('')}
+        </div>
+      </div>` : ''}
+    </div>`;
+  } catch (err) {
+    document.getElementById('predResults').innerHTML = `<div class="text-center py-8">
+      <span class="material-symbols-outlined text-error text-[48px]">error</span>
+      <p class="text-error mt-2">${err.message}</p>
+    </div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-outlined text-[20px]">auto_awesome</span><span class="tracking-wide">Predict Risk</span>';
+  }
+}
+
+// ==================== HELPER: KPI Card ====================
+function kpiCard(label, value, icon, accentColor, subText, trendIcon, trendColor, isError=false, badge='') {
+  const borderColor = isError ? 'bg-error' : `bg-[${accentColor}]`;
+  return `
+  <div class="relative overflow-hidden p-space-lg rounded-xl bg-surface-container-lowest shadow-[0_1px_3px_rgba(10,61,98,0.04)] flex flex-col justify-between hover:shadow-lg transition-shadow group">
+    <div class="absolute top-0 left-0 w-1.5 h-full" style="background:${accentColor}"></div>
+    <div class="flex items-center justify-between">
+      <span class="font-label-md text-label-md text-outline uppercase tracking-wider">${label}</span>
+      <div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center group-hover:scale-105 transition-transform">
+        <span class="material-symbols-outlined text-[18px]" style="color:${accentColor}">${icon}</span>
+      </div>
+    </div>
+    <div class="my-space-sm">
+      <span class="font-metric-display text-metric-display tracking-tight" style="color:${isError ? '#ba1a1a' : accentColor}">${value}</span>
+    </div>
+    <div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm">
+      <span class="font-telemetry-mono text-telemetry-mono" style="color:${trendColor || accentColor}">${subText}</span>
+      ${badge ? `<span class="px-space-2xs py-0.5 rounded bg-surface-container-high font-label-md text-[10px] uppercase">${badge}</span>` : ''}
+    </div>
+  </div>`;
+}
+
+// ==================== HELPER: Donut ====================
+function renderDonut(yieldPct) {
+  const circumference = 2 * Math.PI * 40;
+  const passOffset = circumference * (1 - yieldPct / 100);
+  return `<svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#eff4ff" stroke-width="12"></circle>
+    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#0a3d62" stroke-width="12" stroke-dasharray="${circumference}" stroke-dashoffset="${passOffset}" stroke-linecap="round"></circle>
+    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#fc8121" stroke-width="12" stroke-dasharray="${circumference}" stroke-dashoffset="${circumference - (circumference - circumference * yieldPct / 100)}" stroke-linecap="round" style="transform-origin:50% 50%;transform:rotate(${yieldPct * 3.6}deg)"></circle>
+  </svg>`;
+}
+
+// ==================== HELPER: Sparkline ====================
+function renderSparkline(data, isError) {
+  if (!data || data.length < 2) return '';
+  const min = Math.min(...data), max = Math.max(...data);
+  const range = max - min || 1;
+  const points = data.map((v, i) => {
+    const x = 2 + (i / (data.length - 1)) * 96;
+    const y = 20 - ((v - min) / range) * 16 + 2;
+    return `${x} ${y}`;
+  });
+  const color = isError ? '#ba1a1a' : '#0a3d62';
+  return `<svg class="w-full h-full" fill="none" viewBox="0 0 100 24">
+    <path d="M${points.join(' L')}" stroke="${color}" stroke-linecap="round" stroke-width="2"></path>
+    <circle cx="${points[points.length-1].split(' ')[0]}" cy="${points[points.length-1].split(' ')[1]}" r="2.5" fill="${isError ? '#ba1a1a' : '#fc8121'}"></circle>
+  </svg>`;
+}
+
+// ==================== HELPER: Scatter SVG ====================
+function renderScatterSVG(data) {
+  const points = data.points;
+  if (!points.length) return '<p class="text-center text-outline py-8">No data</p>';
+  const values = points.map(p => p.value_168h);
+  const minVal = 0;
+  const maxVal = Math.max(...values) * 1.2;
+  const chartW = 1100, chartH = 480, padL = 70, padR = 30, padT = 40, padB = 60;
+  const plotW = chartW - padL - padR, plotH = chartH - padT - padB;
+
+  function yPos(v) { return padT + plotH - ((v - minVal) / (maxVal - minVal)) * plotH; }
+  function xPos(i) { return padL + (i / (points.length - 1 || 1)) * plotW; }
+
+  const meanY = yPos(data.lot_mean);
+  const gridLines = [0, 10, 20, 30, 40].filter(v => v <= maxVal);
+
+  let svg = `<svg class="w-full min-w-[900px] h-[400px]" viewBox="0 0 ${chartW} ${chartH}" preserveAspectRatio="none">`;
+  // Grid
+  gridLines.forEach(v => {
+    const y = yPos(v);
+    svg += `<line x1="${padL}" x2="${chartW-padR}" y1="${y}" y2="${y}" stroke="#cbd5e1" stroke-dasharray="2,2" stroke-width="1"/>`;
+    svg += `<text x="${padL-10}" y="${y+4}" fill="#42474e" font-family="spaceGrotesk" font-size="11" text-anchor="end">${v} ${data.unit}</text>`;
+  });
+  // Mean line
+  svg += `<line x1="${padL}" x2="${chartW-padR}" y1="${meanY}" y2="${meanY}" stroke="#0284c7" stroke-dasharray="6,4" stroke-width="1.8"/>`;
+  svg += `<rect x="${padL+5}" y="${meanY-14}" width="140" height="22" rx="4" fill="#0a3d62"/>`;
+  svg += `<text x="${padL+75}" y="${meanY+1}" fill="#fff" font-family="spaceGrotesk" font-size="11" font-weight="700" text-anchor="middle">Lot Avg: ${fmt(data.lot_mean)} ${data.unit}</text>`;
+  // Baseline
+  svg += `<line x1="${padL}" x2="${chartW-padR}" y1="${yPos(0)}" y2="${yPos(0)}" stroke="#0a3d62" stroke-width="1.5"/>`;
+  // Points
+  points.forEach((p, i) => {
+    const cx = xPos(i), cy = yPos(p.value_168h);
+    if (p.flagged) {
+      svg += `<circle cx="${cx}" cy="${cy}" r="5.5" fill="#ba1a1a" stroke="#fff" stroke-width="1.5" class="hover:scale-125 transition-all cursor-pointer"><title>${p.component_id}: ${fmt(p.value_168h)} ${data.unit}</title></circle>`;
+    } else {
+      svg += `<circle cx="${cx}" cy="${cy}" r="3" fill="#003e61" opacity="0.6"><title>${p.component_id}: ${fmt(p.value_168h)} ${data.unit}</title></circle>`;
+    }
+  });
+  // Axes labels
+  svg += `<text x="${chartW/2}" y="${chartH-5}" fill="#0a3d62" font-family="spaceGrotesk" font-size="12" font-weight="600" text-anchor="middle">COMPONENT INDEX [0 - ${points.length}]</text>`;
+  svg += `</svg>`;
+  return svg;
+}
+
+// ==================== HELPER: Drift Chart ====================
+function renderDriftChart(readings, pData) {
+  const checkpoints = [0, 24, 96, 168];
+  const vals = checkpoints.map(h => readings[`${h}h`] || 0);
+  const predicted = pData?.predicted_168h;
+  const allVals = [...vals, predicted].filter(v => v != null);
+  const maxVal = Math.max(...allVals) * 1.3;
+  const chartW = 700, chartH = 340, padL = 60, padR = 30, padT = 25, padB = 30;
+  const plotW = chartW - padL - padR, plotH = chartH - padT - padB;
+
+  function y(v) { return padT + plotH - (v / maxVal) * plotH; }
+  const xPositions = [80, 220, 440, 650];
+
+  let svg = `<svg class="w-full h-full" viewBox="0 0 ${chartW} ${chartH}" preserveAspectRatio="none">`;
+  // Grid
+  const gridVals = [0, 10, 20, 30].filter(v => v <= maxVal);
+  gridVals.forEach(v => {
+    svg += `<line x1="${padL}" x2="${chartW-padR}" y1="${y(v)}" y2="${y(v)}" stroke="#dce9ff" stroke-width="1"/>`;
+    svg += `<text x="${padL-10}" y="${y(v)+4}" fill="#72777f" font-family="spaceGrotesk" font-size="11" text-anchor="end">${v}${pData?.unit || ''}</text>`;
+  });
+
+  // Actual line + fill
+  const actualPoints = xPositions.map((x, i) => `${x},${y(vals[i])}`);
+  svg += `<path d="${actualPoints.map((p,i) => (i===0?'M':'L')+p).join(' ')} L${xPositions[3]},${y(0)} L${xPositions[0]},${y(0)} Z" fill="url(#ag)" opacity="0.15"/>`;
+  svg += `<defs><linearGradient id="ag" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#002743" stop-opacity="0.3"/><stop offset="100%" stop-color="#002743" stop-opacity="0"/></linearGradient></defs>`;
+  svg += `<polyline points="${actualPoints.join(' ')}" fill="none" stroke="#002743" stroke-width="3.5" stroke-linejoin="round"/>`;
+
+  // AI trajectory dashed line (from 24h to predicted 168h)
+  if (predicted != null) {
+    svg += `<path d="M${xPositions[1]},${y(vals[1])} Q${(xPositions[1]+xPositions[3])/2},${y((vals[1]+predicted)/2)} ${xPositions[3]},${y(predicted)}" fill="none" stroke="#fc8121" stroke-dasharray="6,4" stroke-width="3"/>`;
+    svg += `<circle cx="${xPositions[3]}" cy="${y(predicted)}" r="6" fill="#fc8121" stroke="#fff" stroke-width="2"/>`;
+    svg += `<rect x="${xPositions[3]-55}" y="${y(predicted)+10}" width="95" height="20" rx="4" fill="#fc8121"/>`;
+    svg += `<text x="${xPositions[3]-8}" y="${y(predicted)+24}" fill="#fff" font-family="spaceGrotesk" font-size="10" font-weight="700" text-anchor="middle">AI: ${fmt(predicted)}${pData?.unit || ''}</text>`;
+  }
+
+  // Data points
+  xPositions.forEach((x, i) => {
+    const isLast = i === 3;
+    const flagged = isLast && vals[i] > 20;
+    svg += `<circle cx="${x}" cy="${y(vals[i])}" r="${isLast ? 7 : 5}" fill="${flagged ? '#ba1a1a' : '#002743'}" stroke="#fff" stroke-width="2"/>`;
+    svg += `<text x="${x}" y="${y(vals[i])-10}" fill="${flagged ? '#ba1a1a' : '#002743'}" font-family="spaceGrotesk" font-size="11" font-weight="700" text-anchor="middle">${fmt(vals[i])}${pData?.unit || ''}</text>`;
+  });
+
+  // X-axis labels
+  const labels = ['0h Baseline', '24h Check', '96h Midway', '168h Complete'];
+  xPositions.forEach((x, i) => {
+    svg += `<text x="${x}" y="${chartH-2}" fill="#0b1c30" font-family="spaceGrotesk" font-size="11" font-weight="600" text-anchor="middle">${labels[i]}</text>`;
+  });
+
+  svg += '</svg>';
+  return svg;
+}
+
+// ==================== WORKFLOW MODAL ====================
+function openWorkflowModal() {
+  const modal = document.getElementById('workflowModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeWorkflowModal() {
+  const modal = document.getElementById('workflowModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+}
+
+// Close on backdrop click & Escape key
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeWorkflowModal();
+});
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('workflowModal');
+  if (modal && e.target === modal) closeWorkflowModal();
+});
+
+// ==================== UTILS ====================
+function exportReport() { alert('Export functionality would generate PDF/CSV report from API data.'); }
+
+// ==================== INIT ====================
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = window.location.hash.replace('#', '') || 'overview';
+  state.currentPage = hash;
+  updateNav();
+  renderPage();
+});
+window.addEventListener('hashchange', () => {
+  const hash = window.location.hash.replace('#', '') || 'overview';
+  if (hash !== state.currentPage) navigate(hash);
+});
+</script>
+
+  <!-- ==================== POP-OUT WORKFLOW MODAL ==================== -->
+  <div id="workflowModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-md items-center justify-center p-3 sm:p-6 transition-opacity duration-300">
+    <div class="relative w-full max-w-4xl max-h-[92vh] bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/40 flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
+      
+      <!-- Modal Header -->
+      <div class="px-space-lg py-space-md bg-surface-container-low border-b border-surface-container flex items-center justify-between gap-space-md shrink-0">
+        <div class="flex items-center gap-space-sm">
+          <div class="w-10 h-10 rounded-xl bg-secondary/15 flex items-center justify-center text-secondary shadow-sm">
+            <span class="material-symbols-outlined text-[24px]">account_tree</span>
+          </div>
+          <div>
+            <h3 class="font-headline-sm text-headline-sm text-primary font-bold">ISRO Burn-In Screening Workflow & Decision Pipeline</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">Dual-Module Early Rejection & Explainable AI (SHAP) Architecture</p>
+          </div>
+        </div>
+        <button onclick="closeWorkflowModal()" class="w-9 h-9 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center justify-center transition-colors shadow-sm" title="Close modal (Esc)">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-space-lg overflow-y-auto flex flex-col items-center gap-space-md bg-surface-container-lowest">
+        
+        <!-- Workflow Flowchart Container -->
+        <div class="w-full flex flex-col items-center justify-center bg-white rounded-2xl p-6 md:p-8 border border-outline-variant/30 shadow-sm text-center">
+          
+          <!-- Flowchart SVG/HTML Structure -->
+          <div class="flex flex-col items-center w-full max-w-xl text-[#1e293b]">
+            
+            <!-- Step 1: Wide Format -->
+            <div class="w-64 py-2.5 px-4 rounded-xl border border-slate-300 bg-white shadow-sm flex flex-col items-center">
+              <span class="font-bold text-[14.5px] text-slate-900">Wide format</span>
+              <span class="text-[12.5px] text-slate-500">0h · 24h</span>
+            </div>
+            
+            <!-- Arrow Down with Day-1 data label -->
+            <div class="flex flex-col items-center my-0.5">
+              <div class="w-0.5 h-3 bg-slate-400"></div>
+              <span class="text-[11.5px] text-slate-500 font-medium my-0.5">Day-1 data</span>
+              <div class="w-0.5 h-3 bg-slate-400"></div>
+            </div>
+
+            <!-- Branch Fork to Module A & B -->
+            <div class="w-full max-w-[480px] relative flex flex-col items-center">
+              <!-- Top horizontal line -->
+              <div class="w-[320px] h-0.5 bg-slate-400"></div>
+              
+              <div class="w-[320px] flex justify-between">
+                <div class="w-0.5 h-4 bg-slate-400"></div>
+                <div class="w-0.5 h-4 bg-slate-400"></div>
+              </div>
+
+              <!-- Module A & Module B Boxes -->
+              <div class="w-full flex justify-center gap-6">
+                <!-- Module A -->
+                <div class="w-48 py-2.5 px-3 rounded-xl border border-emerald-400 bg-[#e8f5e9] shadow-sm flex flex-col items-center">
+                  <span class="font-bold text-[14px] text-emerald-900">Module A</span>
+                  <span class="text-[12px] text-emerald-700">Quick day-1 scan</span>
+                </div>
+                <!-- Module B -->
+                <div class="w-48 py-2.5 px-3 rounded-xl border border-indigo-300 bg-[#ede7f6] shadow-sm flex flex-col items-center">
+                  <span class="font-bold text-[14px] text-indigo-900">Module B</span>
+                  <span class="text-[12px] text-indigo-700">Predicts 168h value</span>
+                </div>
+              </div>
+
+              <!-- Bottom connectors to "or" -->
+              <div class="w-[320px] flex justify-between">
+                <div class="w-0.5 h-4 bg-slate-400"></div>
+                <div class="w-0.5 h-4 bg-slate-400"></div>
+              </div>
+              <div class="w-[320px] h-0.5 bg-slate-400"></div>
+            </div>
+
+            <!-- "or" connector -->
+            <div class="flex flex-col items-center my-0.5">
+              <span class="text-[11.5px] text-slate-500 font-medium my-0.5">or</span>
+              <div class="w-0.5 h-3 bg-slate-400"></div>
+            </div>
+
+            <!-- Either flags? (Day-1 race) -->
+            <div class="w-56 py-2.5 px-4 rounded-xl border border-amber-300 bg-[#fff3e0] shadow-sm flex flex-col items-center">
+              <span class="font-bold text-[14px] text-amber-950">Either flags?</span>
+              <span class="text-[12px] text-amber-800">Day-1 race</span>
+            </div>
+
+            <!-- Fork No / Yes -->
+            <div class="w-full max-w-[480px] relative flex flex-col items-center mt-0.5">
+              <div class="w-0.5 h-2 bg-slate-400"></div>
+              <div class="w-[320px] h-0.5 bg-slate-400"></div>
+              
+              <div class="w-[320px] flex justify-between items-center text-[11.5px] text-slate-500 font-medium px-8 py-0.5">
+                <span>No</span>
+                <span>Yes</span>
+              </div>
+              
+              <div class="w-[320px] flex justify-between">
+                <div class="w-0.5 h-3 bg-slate-400"></div>
+                <div class="w-0.5 h-3 bg-slate-400"></div>
+              </div>
+
+              <!-- Module A Full vs Early Reject -->
+              <div class="w-full flex justify-center gap-6">
+                <!-- Module A Full -->
+                <div class="w-48 py-2.5 px-3 rounded-xl border border-emerald-400 bg-[#e8f5e9] shadow-sm flex flex-col items-center">
+                  <span class="font-bold text-[14px] text-emerald-900">Module A</span>
+                  <span class="text-[12px] text-emerald-700">Full 0-168h scan</span>
+                </div>
+                <!-- Early Reject -->
+                <div class="w-48 py-2.5 px-3 rounded-xl border border-rose-300 bg-[#ffebee] shadow-sm flex flex-col items-center">
+                  <span class="font-bold text-[14px] text-rose-900">Early reject</span>
+                  <span class="text-[12px] text-rose-700 font-medium">Skips full scan</span>
+                </div>
+              </div>
+
+              <!-- Converge bottom -->
+              <div class="w-[320px] flex justify-between">
+                <div class="w-0.5 h-4 bg-slate-400"></div>
+                <div class="w-0.5 h-4 bg-slate-400"></div>
+              </div>
+              <div class="w-[320px] h-0.5 bg-slate-400"></div>
+              <div class="w-0.5 h-3 bg-slate-400"></div>
+            </div>
+
+            <!-- OR pill -->
+            <div class="px-5 py-1 rounded-lg border border-slate-300 bg-white shadow-xs font-bold text-[12.5px] text-slate-800 my-1">
+              OR
+            </div>
+            
+            <div class="w-0.5 h-4 bg-slate-400"></div>
+
+            <!-- SHAP Node -->
+            <div class="w-40 py-2 px-4 rounded-xl border border-slate-300 bg-white shadow-sm flex flex-col items-center">
+              <span class="font-bold text-[14px] text-slate-900 tracking-wide">SHAP</span>
+            </div>
+
+            <div class="w-0.5 h-4 bg-slate-400"></div>
+
+            <!-- Combined Decision -->
+            <div class="w-56 py-2.5 px-4 rounded-xl border border-slate-300 bg-white shadow-sm flex flex-col items-center">
+              <span class="font-bold text-[14.5px] text-slate-900">Combined decision</span>
+              <span class="text-[12px] text-slate-600 font-medium">Pass / Fail</span>
+            </div>
+
+          </div>
+
+          <!-- Fallback / Image reference -->
+          <div class="mt-4 pt-3 border-t border-slate-200 w-full max-w-xl flex items-center justify-between text-slate-500 text-[12px]">
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Live Vector Workflow</span>
+            <a href="/api/workflow-image" target="_blank" class="text-secondary hover:underline flex items-center gap-1 font-semibold">
+              <span class="material-symbols-outlined text-[15px]">open_in_new</span>
+              <span>Open Source PNG File</span>
+            </a>
+          </div>
+
+        </div>
+
+        <!-- 3 Architecture Stages -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-space-sm w-full mt-space-xs text-left">
+          <div class="p-space-sm rounded-xl bg-surface-container-low border border-outline-variant/30 flex flex-col gap-1 shadow-sm">
+            <div class="flex items-center gap-1.5 text-secondary font-bold font-telemetry-mono text-[12px]">
+              <span class="w-2 h-2 rounded-full bg-secondary"></span>
+              <span>1. DAY-1 CONCURRENT RACE</span>
+            </div>
+            <p class="text-[13px] text-on-surface-variant leading-snug">Module A (Statistical Outliers) + Module B (XGBoost 168h Trajectory) process 0h & 24h telemetry in parallel.</p>
+          </div>
+          <div class="p-space-sm rounded-xl bg-surface-container-low border border-outline-variant/30 flex flex-col gap-1 shadow-sm">
+            <div class="flex items-center gap-1.5 text-error font-bold font-telemetry-mono text-[12px]">
+              <span class="w-2 h-2 rounded-full bg-error"></span>
+              <span>2. EARLY REJECT (DAY-1)</span>
+            </div>
+            <p class="text-[13px] text-on-surface-variant leading-snug">If either module detects drift violation at 24h, component is early-rejected, saving 144 chamber hours.</p>
+          </div>
+          <div class="p-space-sm rounded-xl bg-surface-container-low border border-outline-variant/30 flex flex-col gap-1 shadow-sm">
+            <div class="flex items-center gap-1.5 text-primary font-bold font-telemetry-mono text-[12px]">
+              <span class="w-2 h-2 rounded-full bg-primary"></span>
+              <span>3. SHAP EXPLAINABILITY</span>
+            </div>
+            <p class="text-[13px] text-on-surface-variant leading-snug">TreeSHAP computes exact physical parameter contributions for the final combined qualification verdict.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-space-lg py-space-sm bg-surface-container-low border-t border-surface-container flex items-center justify-between shrink-0">
+        <span class="font-telemetry-mono text-[12px] text-outline">Standard: MIL-STD-883K Method 1015 // ISRO-URSC-QA-4402</span>
+        <button onclick="closeWorkflowModal()" class="px-space-xl py-1.5 rounded-lg bg-primary hover:bg-primary/90 text-on-primary font-label-md text-[13px] font-semibold transition-all shadow-sm">
+          Close Window
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</body></html>

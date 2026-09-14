@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Burn-In Anomaly Detection — Mission Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080A0D;
+  --bg-panel:#12161D;
+  --bg-panel-raised:#171C25;
+  --border:#232A35;
+  --border-soft:#1A2029;
+  --text:#E7EBF0;
+  --text-dim:#8A93A3;
+  --text-faint:#565F6E;
+  --teal:#3FD8C4;
+  --teal-dim:#1E5A52;
+  --amber:#FF9B4D;
+  --red:#FF4D4D;
+  --thermal-1:#1B2A6B;
+  --thermal-2:#3FD8C4;
+  --thermal-3:#FF9B4D;
+  --thermal-4:#FF3B3B;
+  --font-mono:'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-sans:'IBM Plex Sans', -apple-system, 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --radius:10px;
+  --ease:cubic-bezier(.16,.84,.44,1);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-sans);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--teal-dim); color:var(--text);}
+a{color:inherit;}
+button{font-family:inherit; cursor:pointer;}
+
+.ambient{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
+.ambient .blob{position:absolute; border-radius:50%; filter:blur(90px); opacity:.14;}
+.ambient .b1{width:640px; height:640px; background:var(--teal); top:-220px; left:-160px; animation:driftA 26s ease-in-out infinite alternate;}
+.ambient .b2{width:520px; height:520px; background:var(--amber); bottom:-200px; right:-140px; animation:driftB 32s ease-in-out infinite alternate;}
+@keyframes driftA{0%{transform:translate(0,0);} 100%{transform:translate(60px,50px);}}
+@keyframes driftB{0%{transform:translate(0,0);} 100%{transform:translate(-50px,-40px);}}
+.ambient .grid{
+  position:absolute; inset:0; opacity:.35;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size:42px 42px;
+  mask-image:radial-gradient(1200px 700px at 30% 0%, black 30%, transparent 75%);
+}
+.ambient .scan{
+  position:absolute; left:0; right:0; height:120px;
+  background:linear-gradient(180deg, transparent, rgba(63,216,196,0.035), transparent);
+  animation:scanmove 9s linear infinite;
+}
+@keyframes scanmove{0%{top:-120px;} 100%{top:100vh;}}
+
+#boot{
+  position:fixed; inset:0; z-index:999; background:#08090B;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  font-family:var(--font-mono); transition:opacity .6s ease, visibility .6s ease;
+}
+#boot.hide{opacity:0; visibility:hidden; pointer-events:none;}
+.boot-inner{width:440px; max-width:88vw;}
+.boot-logo{
+  width:52px; height:52px; border-radius:12px; margin:0 auto 22px auto;
+  background:linear-gradient(135deg, var(--thermal-1), var(--teal) 55%, var(--amber));
+  display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:17px; color:#06090B;
+  box-shadow:0 0 40px rgba(63,216,196,0.25);
+  animation:logoPulse 2.2s ease-in-out infinite;
+}
+@keyframes logoPulse{0%,100%{box-shadow:0 0 30px rgba(63,216,196,0.2);} 50%{box-shadow:0 0 52px rgba(63,216,196,0.4);}}
+.boot-lines{min-height:168px; font-size:12px; line-height:1.9; color:var(--text-dim);}
+.boot-line{opacity:0; display:flex; justify-content:space-between; gap:10px;}
+.boot-line.show{animation:lineIn .35s var(--ease) forwards;}
+@keyframes lineIn{from{opacity:0; transform:translateX(-6px);} to{opacity:1; transform:translateX(0);}}
+.boot-line .ok{color:var(--teal); flex-shrink:0;}
+.boot-bar-track{height:2px; background:var(--border-soft); border-radius:2px; margin-top:20px; overflow:hidden;}
+.boot-bar-fill{height:100%; width:0%; background:linear-gradient(90deg, var(--teal), var(--amber)); transition:width .25s linear;}
+.boot-pct{font-size:10.5px; color:var(--text-faint); margin-top:8px; text-align:right;}
+.boot-title{text-align:center; font-size:12.5px; letter-spacing:.14em; color:var(--text); margin-bottom:26px; text-transform:uppercase;}
+.boot-title .sub{display:block; font-size:10px; color:var(--text-faint); letter-spacing:.1em; margin-top:5px;}
+
+.app{position:relative; z-index:1; display:grid; grid-template-columns:220px 1fr; min-height:100vh; opacity:0;}
+.app.ready{opacity:1; transition:opacity .5s ease;}
+.app > div:last-child{min-width:0;}
+
+.sidebar{
+  background:rgba(18,22,29,0.75); backdrop-filter:blur(10px);
+  border-right:1px solid var(--border-soft);
+  display:flex; flex-direction:column;
+  padding:22px 14px;
+  position:sticky; top:0; height:100vh;
+  transform:translateX(-16px); opacity:0;
+}
+.app.ready .sidebar{animation:slideIn .55s var(--ease) .05s forwards;}
+@keyframes slideIn{to{transform:translateX(0); opacity:1;}}
+
+.brand{display:flex; align-items:center; gap:10px; padding:0 8px 24px 8px;}
+.brand-mark{
+  width:34px; height:34px; border-radius:8px;
+  background:linear-gradient(135deg, var(--thermal-1), var(--thermal-2) 55%, var(--thermal-3));
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-weight:700; font-size:13px; color:#0A0D12;
+  flex-shrink:0; box-shadow:0 0 22px rgba(63,216,196,0.18);
+}
+.brand-text{line-height:1.15;}
+.brand-text .l1{font-family:var(--font-mono); font-size:12.5px; font-weight:600; letter-spacing:0.03em; color:var(--text);}
+.brand-text .l2{font-size:10px; color:var(--text-faint); letter-spacing:0.04em; text-transform:uppercase; margin-top:2px;}
+
+.nav{display:flex; flex-direction:column; gap:2px; margin-top:6px;}
+.nav-item{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:8px;
+  color:var(--text-dim); font-size:13px; font-weight:500;
+  border:1px solid transparent; position:relative;
+  transition:background .18s ease, color .18s ease, border-color .18s ease, transform .12s ease;
+}
+.nav-item svg{width:16px; height:16px; flex-shrink:0; opacity:.85; transition:transform .2s ease;}
+.nav-item:hover{background:var(--bg-panel-raised); color:var(--text); transform:translateX(2px);}
+.nav-item:hover svg{transform:scale(1.08);}
+.nav-item.active{
+  background:rgba(63,216,196,0.08);
+  border-color:rgba(63,216,196,0.25);
+  color:var(--teal);
+}
+.nav-item.active svg{opacity:1;}
+.nav-item.active::before{
+  content:''; position:absolute; left:-14px; top:50%; transform:translateY(-50%);
+  width:3px; height:16px; border-radius:2px; background:var(--teal); box-shadow:0 0 8px var(--teal);
+}
+
+.sidebar-foot{margin-top:auto; padding:14px 10px 4px 10px; border-top:1px solid var(--border-soft);}
+.sidebar-foot .row{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+.dot{width:7px; height:7px; border-radius:50%; background:var(--teal); box-shadow:0 0 8px var(--teal); flex-shrink:0;}
+.sidebar-foot .small{font-size:10.5px; color:var(--text-faint); font-family:var(--font-mono); letter-spacing:.02em;}
+
+.topbar{
+  height:60px; border-bottom:1px solid var(--border-soft);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 28px;
+  background:rgba(8,10,13,0.6); backdrop-filter:blur(8px);
+  position:sticky; top:0; z-index:10;
+  transform:translateY(-10px); opacity:0;
+}
+.app.ready .topbar{animation:dropIn .5s var(--ease) .12s forwards;}
+@keyframes dropIn{to{transform:translateY(0); opacity:1;}}
+.topbar-title{font-size:14px; font-weight:600; color:var(--text);}
+.topbar-sub{font-size:11px; color:var(--text-faint); font-family:var(--font-mono); margin-top:2px;}
+.topbar-right{display:flex; align-items:center; gap:18px;}
+.status-pill{
+  display:flex; align-items:center; gap:7px;
+  font-family:var(--font-mono); font-size:11px; color:var(--teal);
+  background:rgba(63,216,196,0.08); border:1px solid rgba(63,216,196,0.25);
+  padding:5px 11px; border-radius:20px;
+}
+.status-pill .dot{background:var(--teal); box-shadow:0 0 6px var(--teal); animation:pulse 2s infinite ease-in-out;}
+@keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.35;}}
+
+.main{padding:26px 28px 60px 28px; width:100%; max-width:100%;}
+.view{display:none;}
+.view.active{display:block; animation:viewIn .4s var(--ease);}
+@keyframes viewIn{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+
+.reveal{opacity:0; transform:translateY(14px);}
+.app.ready .reveal{animation:revealIn .5s var(--ease) forwards;}
+@keyframes revealIn{to{opacity:1; transform:translateY(0);}}
+
+.section-head{margin-bottom:18px;}
+.section-head h1{font-size:20px; font-weight:600; letter-spacing:-0.01em;}
+.section-head p{font-size:12.5px; color:var(--text-dim); margin-top:4px; max-width:640px; line-height:1.55;}
+.eyebrow{
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--amber); margin-bottom:6px; display:block;
+}
+
+.kpi-row{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin-bottom:26px;}
+.kpi-card{
+  background:var(--bg-panel); border:1px solid var(--border-soft); border-radius:var(--radius);
+  padding:16px 16px 14px 16px; position:relative; overflow:hidden;
+  transition:border-color .2s ease, transform .2s ease;
+}
+.kpi-card:hover{border-color:rgba(63,216,196,0.3); transform:translateY(-2px);}
+.kpi-card::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--kpi-accent, var(--teal)); opacity:.75;
+}
+.kpi-label{font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; font-weight:600;}
+.kpi-value{font-family:var(--font-mono); font-size:27px; font-weight:600; margin-top:9px; color:var(--text); letter-spacing:-0.01em; font-variant-numeric:tabular-nums;}
+.kpi-note{font-size:10.5px; color:var(--text-dim); margin-top:5px;}
+
+.panel{
+  background:var(--bg-panel); border:1px solid var(--border-soft); border-radius:var(--radius);
+  padding:20px; margin-bottom:20px;
+}
+.panel-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px;}
+.panel-title{font-size:13.5px; font-weight:600;}
+.panel-title .mono-tag{font-family:var(--font-mono); font-size:10px; color:var(--text-faint); margin-left:8px; font-weight:400;}
+
+.heatstrip-wrap{overflow-x:auto; padding-bottom:6px;}
+.heatstrip{display:flex; align-items:flex-end; gap:2px; height:88px; min-width:max-content; padding:4px 2px;}
+.heat-bar{
+  width:7px; border-radius:2px 2px 0 0; cursor:pointer;
+  transform-origin:bottom; transform:scaleY(0);
+  transition:transform .3s var(--ease), filter .12s ease, box-shadow .12s ease;
+}
+.heat-bar.grown{transform:scaleY(1);}
+.heat-bar:hover{filter:brightness(1.3); box-shadow:0 0 10px currentColor; z-index:5;}
+.heatstrip-legend{display:flex; align-items:center; gap:16px; margin-top:12px; font-size:10.5px; color:var(--text-dim);}
+.legend-grad{width:120px; height:6px; border-radius:3px; background:linear-gradient(90deg, var(--thermal-1), var(--thermal-2) 35%, var(--thermal-3) 70%, var(--thermal-4));}
+
+.data-table{width:100%; border-collapse:collapse; font-size:12px;}
+.data-table th{
+  text-align:left; font-family:var(--font-mono); font-size:10px; text-transform:uppercase;
+  letter-spacing:.05em; color:var(--text-faint); font-weight:600;
+  padding:8px 10px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg-panel);
+}
+.data-table td{padding:8px 10px; border-bottom:1px solid var(--border-soft); font-family:var(--font-mono); color:var(--text-dim);}
+.data-table tbody tr{cursor:pointer; transition:background .12s ease; position:relative;}
+.data-table tbody tr:hover{background:var(--bg-panel-raised);}
+.data-table tbody tr.flagged td{color:var(--text);}
+.table-scroll{max-height:360px; overflow-y:auto; border-radius:6px;}
+.badge{
+  display:inline-flex; align-items:center; gap:5px; font-family:var(--font-mono); font-size:10px;
+  padding:3px 8px; border-radius:20px; font-weight:600; letter-spacing:.02em;
+}
+.badge.flag{background:rgba(255,77,77,0.12); color:var(--red); border:1px solid rgba(255,77,77,0.3);}
+.badge.pass{background:rgba(63,216,196,0.1); color:var(--teal); border:1px solid rgba(63,216,196,0.25);}
+
+select, input[type=number], input[type=text]{
+  background:var(--bg-panel-raised); border:1px solid var(--border); color:var(--text);
+  font-family:var(--font-mono); font-size:12.5px; padding:9px 12px; border-radius:7px;
+  outline:none; transition:border-color .15s ease, box-shadow .15s ease;
+}
+select:focus, input:focus{border-color:var(--teal); box-shadow:0 0 0 3px rgba(63,216,196,0.12);}
+label{font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; font-weight:600; display:block; margin-bottom:7px;}
+.btn{
+  background:var(--teal); color:#06110F; border:none; font-weight:600; font-size:12.5px;
+  padding:10px 18px; border-radius:7px; transition:filter .15s ease, transform .1s ease, box-shadow .2s ease;
+}
+.btn:hover{filter:brightness(1.08); box-shadow:0 0 22px rgba(63,216,196,0.3);}
+.btn:active{transform:scale(.97);}
+.field{display:flex; flex-direction:column; gap:0;}
+.field-row{display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap;}
+
+.drill-grid{display:grid; grid-template-columns:220px 1fr; gap:20px;}
+.metric-stack{display:flex; flex-direction:column; gap:10px;}
+.metric-box{background:var(--bg-panel-raised); border:1px solid var(--border-soft); border-radius:8px; padding:12px 14px; transition:border-color .2s ease;}
+.metric-box .k{font-size:10px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; font-weight:600;}
+.metric-box .v{font-family:var(--font-mono); font-size:18px; font-weight:600; margin-top:4px;}
+.explain-banner{
+  margin-top:16px; padding:14px 16px; border-radius:8px;
+  background:rgba(255,155,77,0.06); border:1px solid rgba(255,155,77,0.22);
+  font-size:12.5px; line-height:1.6; color:var(--text);
+  opacity:0; animation:revealIn .4s var(--ease) .1s forwards;
+}
+.explain-banner.ok{background:rgba(63,216,196,0.06); border-color:rgba(63,216,196,0.22);}
+.explain-banner .tag{
+  font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--amber); font-weight:700; display:block; margin-bottom:6px;
+}
+.explain-banner.ok .tag{color:var(--teal);}
+
+.verdict{
+  margin-top:20px; padding:22px; border-radius:10px; display:flex; align-items:center; gap:22px;
+  border:1px solid var(--border-soft); background:var(--bg-panel-raised);
+  opacity:0; transform:scale(.98);
+}
+.verdict.show{animation:verdictIn .45s var(--ease) forwards;}
+@keyframes verdictIn{to{opacity:1; transform:scale(1);}}
+.verdict-badge{
+  font-family:var(--font-mono); font-weight:700; font-size:14px; padding:10px 18px; border-radius:8px;
+  letter-spacing:.03em; flex-shrink:0;
+}
+.verdict-badge.reject{background:rgba(255,77,77,0.12); color:var(--red); border:1px solid rgba(255,77,77,0.35);}
+.verdict-badge.pass{background:rgba(63,216,196,0.12); color:var(--teal); border:1px solid rgba(63,216,196,0.35);}
+.verdict-detail{font-size:12.5px; color:var(--text-dim); line-height:1.55; flex:1;}
+.verdict-detail b{color:var(--text); font-weight:600;}
+.gauge-wrap{flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:4px;}
+.gauge-label{font-family:var(--font-mono); font-size:9px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em;}
+
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.small-note{font-size:11px; color:var(--text-faint); margin-top:14px; line-height:1.6; font-family:var(--font-mono);}
+
+.mobile-nav{
+  display:none; gap:6px; padding:10px 14px; overflow-x:auto;
+  border-bottom:1px solid var(--border-soft); background:var(--bg-panel);
+  position:sticky; top:60px; z-index:9;
+}
+.mobile-nav button{
+  flex-shrink:0; font-family:var(--font-mono); font-size:11px; padding:7px 12px;
+  border-radius:20px; border:1px solid var(--border); background:var(--bg-panel-raised); color:var(--text-dim);
+}
+.mobile-nav button.active{color:var(--teal); border-color:rgba(63,216,196,0.4); background:rgba(63,216,196,0.08);}
+
+@media (max-width:980px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+  .drill-grid{grid-template-columns:1fr;}
+  .grid-2{grid-template-columns:1fr;}
+  .mobile-nav{display:flex;}
+  .main{padding-top:8px;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+}
+</style>
+</head>
+<body>
+
+<div class="ambient">
+  <div class="grid"></div>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="scan"></div>
+</div>
+
+<div id="boot">
+  <div class="boot-inner">
+    <div class="boot-logo">Bi</div>
+    <div class="boot-title">Burn-In Anomaly Detection<span class="sub">SIH 2026 · PS 26170 · ISRO Dept. of Space</span></div>
+    <div class="boot-lines" id="boot-lines"></div>
+    <div class="boot-bar-track"><div class="boot-bar-fill" id="boot-bar"></div></div>
+    <div class="boot-pct" id="boot-pct">0%</div>
+  </div>
+</div>
+
+<div class="app" id="app">
+
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">Bi</div>
+      <div class="brand-text">
+        <div class="l1">BURN-IN CONSOLE</div>
+        <div class="l2">SIH 2026 · PS 26170</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-item active" data-view="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Overview
+      </div>
+      <div class="nav-item" data-view="lots">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9l8-5 8 5v10"/><path d="M4 19h16"/><path d="M9 19v-6h6v6"/></svg>
+        Lot Explorer
+      </div>
+      <div class="nav-item" data-view="component">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        Component
+      </div>
+      <div class="nav-item" data-view="predict">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 6h7v7"/></svg>
+        Live Predictor
+      </div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="row"><span class="dot"></span><span class="small">MODEL: XGBOOST + SHAP</span></div>
+      <div class="row"><span class="dot" style="background:var(--amber); box-shadow:0 0 8px var(--amber);"></span><span class="small">TEAM CODEWALKERS</span></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">AI-Driven Anomaly Detection in Component Burn-In &amp; Screening</div>
+        <div class="topbar-sub">125°C BURN-IN · 0H / 24H / 96H / 168H</div>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill"><span class="dot"></span>PIPELINE LIVE</div>
+      </div>
+    </div>
+
+    <div class="mobile-nav" id="mobile-nav">
+      <button class="active" data-view="overview">Overview</button>
+      <button data-view="lots">Lot Explorer</button>
+      <button data-view="component">Component</button>
+      <button data-view="predict">Live Predictor</button>
+    </div>
+
+    <div class="main">
+
+      <div class="view active" id="view-overview">
+        <div class="section-head reveal" style="animation-delay:.18s">
+          <span class="eyebrow">Mission Summary</span>
+          <h1>Screening Overview</h1>
+          <p>Every component tested during the 168-hour burn-in cycle, screened for both hard spec violations and latent drift relative to its own manufacturing lot.</p>
+        </div>
+
+        <div class="kpi-row reveal" id="kpi-row" style="animation-delay:.24s"></div>
+
+        <div class="panel reveal" style="animation-delay:.3s">
+          <div class="panel-head">
+            <div class="panel-title">Thermal Heat Strip <span class="mono-tag">ALL LOTS · CLICK A BAR TO INSPECT</span></div>
+          </div>
+          <div class="heatstrip-wrap"><div class="heatstrip" id="heatstrip-all"></div></div>
+          <div class="heatstrip-legend">
+            <span>Anomaly severity:</span>
+            <div class="legend-grad"></div>
+            <span>nominal → latent drift → critical</span>
+          </div>
+        </div>
+
+        <div class="grid-2 reveal" style="animation-delay:.36s">
+          <div class="panel">
+            <div class="panel-title" style="margin-bottom:12px;">Module A — Lot-Relative Detection</div>
+            <p style="font-size:12px; color:var(--text-dim); line-height:1.6;">Per-lot Z-score, IQR, and Isolation Forest jointly across all four checkpoints. Flags components that deviate from <b style="color:var(--text)">their own batch</b>, not just the datasheet limit — catching parts that pass the 50µA spec but drift abnormally against their peers.</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title" style="margin-bottom:12px;">Module B — Drift Prediction</div>
+            <p style="font-size:12px; color:var(--text-dim); line-height:1.6;">XGBoost regression forecasts the 168h reading from 0h/24h alone. When the predicted drift slope crosses the safety threshold, the part is flagged for <b style="color:var(--text)">early rejection</b> — before the full week-long cycle completes.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="view" id="view-lots">
+        <div class="section-head">
+          <span class="eyebrow">Batch Inspection</span>
+          <h1>Lot Explorer</h1>
+          <p>Compare every component in a manufacturing lot against its own batch statistics — the core insight behind Module A.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="field">
+              <label>Select Lot</label>
+              <select id="lot-select"></select>
+            </div>
+            <div id="lot-stats" style="font-family:var(--font-mono); font-size:11px; color:var(--text-dim);"></div>
+          </div>
+          <div class="heatstrip-wrap"><div class="heatstrip" id="heatstrip-lot"></div></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title" style="margin-bottom:14px;">Component Readings</div>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead><tr>
+                <th>Component</th><th>0h</th><th>24h</th><th>96h</th><th>168h</th><th>Anomaly Score</th><th>Status</th>
+              </tr></thead>
+              <tbody id="lot-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="view" id="view-component">
+        <div class="section-head">
+          <span class="eyebrow">Explainability</span>
+          <h1>Component Drill-Down</h1>
+          <p>Every flag traces back to a plain-language reason — SHAP-attributed for Module B, lot-deviation for Module A.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="field" style="min-width:260px;">
+              <label>Search Component ID</label>
+              <input type="text" id="component-search" list="component-list" placeholder="e.g. C_00059">
+              <datalist id="component-list"></datalist>
+            </div>
+          </div>
+
+          <div class="drill-grid">
+            <div class="metric-stack" id="metric-stack"></div>
+            <div>
+              <svg id="drift-svg" viewBox="0 0 560 220" style="width:100%; height:220px;"></svg>
+              <div style="display:flex; gap:18px; font-size:10.5px; color:var(--text-dim); margin-top:8px;">
+                <span><span style="display:inline-block;width:10px;height:2px;background:var(--teal);vertical-align:middle;margin-right:5px;"></span>Actual reading</span>
+                <span><span style="display:inline-block;width:10px;height:2px;background:var(--amber);border-top:2px dashed var(--amber);vertical-align:middle;margin-right:5px;"></span>Predicted (from 0h/24h)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="explain-banner" id="explain-banner"></div>
+        </div>
+      </div>
+
+      <div class="view" id="view-predict">
+        <div class="section-head">
+          <span class="eyebrow">Early Rejection</span>
+          <h1>Live Drift Predictor</h1>
+          <p>Enter 0h and 24h readings for a component still under test — no need to wait out the full 168-hour cycle. Runs the trained regression client-side, instantly.</p>
+        </div>
+
+        <div class="panel">
+          <div class="field-row">
+            <div class="field">
+              <label>Lot</label>
+              <select id="predict-lot"></select>
+            </div>
+            <div class="field">
+              <label>Value at 0h (µA)</label>
+              <input type="number" id="predict-0h" value="10.0" step="0.1">
+            </div>
+            <div class="field">
+              <label>Value at 24h (µA)</label>
+              <input type="number" id="predict-24h" value="12.0" step="0.1">
+            </div>
+            <button class="btn" id="predict-btn">Predict &amp; Assess Risk</button>
+          </div>
+
+          <div class="verdict" id="verdict">
+            <div class="verdict-badge" id="verdict-badge"></div>
+            <div class="verdict-detail" id="verdict-detail"></div>
+            <div class="gauge-wrap">
+              <svg id="gauge-svg" width="96" height="96" viewBox="0 0 96 96"></svg>
+              <span class="gauge-label">Drift Slope</span>
+            </div>
+          </div>
+
+          <div class="small-note">Client-side inference uses the trained linear model coefficients (intercept + 6 engineered features) replicated exactly from the Python pipeline — no server round-trip required for this demo. The production system runs the full XGBoost + SHAP explainer via the FastAPI backend.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = __DATA_PLACEHOLDER__;
+const COMPONENTS = DATA.components;
+const LOTS = DATA.lots;
+const SAFETY_SLOPE = 0.00662;
+
+const LIN_COEF = {
+  Value_0h: -0.44597259357865,
+  Value_24h: 1.7521030602230423,
+  delta_24h: 2.198075653801704,
+  pct_change_24h: -4.756366926882805,
+  slope_0_24: 0.09158648557507089,
+  lot_mean_0h: -0.31470022440669704
+};
+const LIN_INTERCEPT = 0.20131820557528357;
+
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const BOOT_STEPS = [
+  "Initializing burn-in anomaly detection system",
+  "Loading 1000 component records across 25 lots",
+  "Connecting Module A — lot-relative anomaly detection",
+  "Connecting Module B — drift prediction engine",
+  "SHAP explainability layer — online",
+  "All systems nominal"
+];
+function runBoot(){
+  const linesEl = document.getElementById('boot-lines');
+  const barEl = document.getElementById('boot-bar');
+  const pctEl = document.getElementById('boot-pct');
+  const boot = document.getElementById('boot');
+  const app = document.getElementById('app');
+
+  if(REDUCED_MOTION){
+    boot.classList.add('hide');
+    app.classList.add('ready');
+    afterBoot();
+    return;
+  }
+
+  let i = 0;
+  const stepDelay = 260;
+  function nextLine(){
+    if(i < BOOT_STEPS.length){
+      const line = document.createElement('div');
+      line.className = 'boot-line';
+      line.innerHTML = `<span>${BOOT_STEPS[i]}</span><span class="ok">OK</span>`;
+      linesEl.appendChild(line);
+      requestAnimationFrame(()=>line.classList.add('show'));
+      const pct = Math.round(((i+1)/BOOT_STEPS.length)*100);
+      barEl.style.width = pct+'%';
+      pctEl.textContent = pct+'%';
+      i++;
+      setTimeout(nextLine, stepDelay);
+    } else {
+      setTimeout(()=>{
+        boot.classList.add('hide');
+        app.classList.add('ready');
+        afterBoot();
+      }, 320);
+    }
+  }
+  setTimeout(nextLine, 250);
+}
+
+function afterBoot(){
+  renderKPIs();
+  renderHeatStrip(document.getElementById('heatstrip-all'), COMPONENTS);
+  initLotSelect();
+  initComponentSearch();
+  initPredictor();
+  renderComponent('C_00001');
+}
+
+function switchView(viewName){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.view===viewName));
+  document.querySelectorAll('.mobile-nav button').forEach(n=>n.classList.toggle('active', n.dataset.view===viewName));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+viewName).classList.add('active');
+}
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click', ()=>switchView(item.dataset.view));
+});
+document.querySelectorAll('.mobile-nav button').forEach(btn=>{
+  btn.addEventListener('click', ()=>switchView(btn.dataset.view));
+});
+
+function thermalColor(score){
+  const stops = [
+    [0,   [27,42,107]],
+    [35,  [63,216,196]],
+    [70,  [255,155,77]],
+    [100, [255,59,59]]
+  ];
+  let lo=stops[0], hi=stops[stops.length-1];
+  for(let i=0;i<stops.length-1;i++){
+    if(score>=stops[i][0] && score<=stops[i+1][0]){ lo=stops[i]; hi=stops[i+1]; break; }
+  }
+  const t = (score-lo[0])/((hi[0]-lo[0])||1);
+  const c = lo[1].map((v,i)=>Math.round(v+(hi[1][i]-v)*t));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+
+function countUp(el, target){
+  const isPct = typeof target === 'string' && target.includes('%');
+  const isUnit = typeof target === 'string' && target.match(/[a-zA-Zµ]/);
+  const numeric = parseFloat(target);
+  const suffix = isPct ? '%' : (isUnit ? target.replace(/^[\d.\-]+/,'') : '');
+  const decimals = (String(numeric).split('.')[1]||'').length;
+  if(REDUCED_MOTION || isNaN(numeric)){ el.textContent = target; return; }
+  const dur = 900, start = performance.now();
+  function frame(now){
+    const p = Math.min((now-start)/dur, 1);
+    const eased = 1 - Math.pow(1-p, 3);
+    const val = numeric*eased;
+    el.textContent = (decimals ? val.toFixed(decimals) : Math.round(val)) + suffix;
+    if(p < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function renderKPIs(){
+  const total = COMPONENTS.length;
+  const flagged = COMPONENTS.filter(c=>c.final_flag).length;
+  const tp = COMPONENTS.filter(c=>c.final_flag && c.is_defective).length;
+  const fn = COMPONENTS.filter(c=>!c.final_flag && c.is_defective).length;
+  const fp = COMPONENTS.filter(c=>c.final_flag && !c.is_defective).length;
+  const recall = tp/(tp+fn||1);
+  const precision = tp/(tp+fp||1);
+  const mae = COMPONENTS.reduce((s,c)=>s+Math.abs(c.predicted_168h-c.Value_168h),0)/total;
+
+  const kpis = [
+    {label:'Components Tested', value: total, note: `${LOTS.length} lots`, accent:'var(--teal)'},
+    {label:'Flagged for Review', value: flagged, note: `${(flagged/total*100).toFixed(1)}% of batch`, accent:'var(--amber)'},
+    {label:'Recall', value: (recall*100).toFixed(0)+'%', note: `${fn} false negatives`, accent: fn===0 ? 'var(--teal)' : 'var(--red)'},
+    {label:'Precision', value: (precision*100).toFixed(0)+'%', note: `${fp} false positives`, accent:'var(--amber)'},
+    {label:'Prediction MAE', value: mae.toFixed(2)+' µA', note: '168h forecast error', accent:'var(--teal)'},
+  ];
+  document.getElementById('kpi-row').innerHTML = kpis.map((k)=>`
+    <div class="kpi-card" style="--kpi-accent:${k.accent}">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value" data-target="${k.value}"></div>
+      <div class="kpi-note">${k.note}</div>
+    </div>`).join('');
+  document.querySelectorAll('.kpi-value').forEach((el,i)=>{
+    setTimeout(()=>countUp(el, kpis[i].value), i*70);
+  });
+}
+
+function renderHeatStrip(container, components){
+  const maxH = 80, minH = 10;
+  container.innerHTML = components.map(c=>{
+    const h = minH + (c.anomaly_score/100)*(maxH-minH);
+    const color = thermalColor(c.anomaly_score);
+    return `<div class="heat-bar" style="height:${h}px; background:${color}; color:${color};" title="${c.component_id} — score ${c.anomaly_score}" data-id="${c.component_id}"></div>`;
+  }).join('');
+  const bars = container.querySelectorAll('.heat-bar');
+  const n = bars.length;
+  const maxStagger = 480;
+  bars.forEach((bar,i)=>{
+    const delay = REDUCED_MOTION ? 0 : Math.min(i*(maxStagger/Math.min(n,120)), maxStagger);
+    setTimeout(()=>bar.classList.add('grown'), delay);
+    bar.addEventListener('click', ()=>goToComponent(bar.dataset.id));
+  });
+}
+
+function initLotSelect(){
+  const sel = document.getElementById('lot-select');
+  sel.innerHTML = LOTS.map(l=>`<option value="${l.lot_id}">${l.lot_id}</option>`).join('');
+  sel.addEventListener('change', ()=>renderLot(sel.value));
+  renderLot(LOTS[0].lot_id);
+}
+function renderLot(lotId){
+  const lotComponents = COMPONENTS.filter(c=>c.lot_id===lotId).sort((a,b)=>a.component_id.localeCompare(b.component_id));
+  const lot = LOTS.find(l=>l.lot_id===lotId);
+  renderHeatStrip(document.getElementById('heatstrip-lot'), lotComponents);
+  document.getElementById('lot-stats').innerHTML =
+    `MEAN 168H: ${lot.mean_168h.toFixed(2)}µA &nbsp;·&nbsp; STD: ${lot.std_168h.toFixed(2)}µA &nbsp;·&nbsp; FLAGGED: ${lot.n_flagged}/${lot.n}`;
+
+  const sorted = [...lotComponents].sort((a,b)=>b.anomaly_score-a.anomaly_score);
+  document.getElementById('lot-table-body').innerHTML = sorted.map(c=>`
+    <tr class="${c.final_flag?'flagged':''}" data-id="${c.component_id}">
+      <td>${c.component_id}</td>
+      <td>${c.Value_0h.toFixed(2)}</td>
+      <td>${c.Value_24h.toFixed(2)}</td>
+      <td>${c.Value_96h.toFixed(2)}</td>
+      <td>${c.Value_168h.toFixed(2)}</td>
+      <td>${c.anomaly_score.toFixed(1)}</td>
+      <td>${c.final_flag ? '<span class="badge flag">FLAGGED</span>' : '<span class="badge pass">NOMINAL</span>'}</td>
+    </tr>`).join('');
+  document.querySelectorAll('#lot-table-body tr').forEach(tr=>{
+    tr.addEventListener('click', ()=>goToComponent(tr.dataset.id));
+  });
+}
+
+function initComponentSearch(){
+  const dl = document.getElementById('component-list');
+  dl.innerHTML = COMPONENTS.map(c=>`<option value="${c.component_id}">`).join('');
+  const input = document.getElementById('component-search');
+  input.addEventListener('change', ()=>renderComponent(input.value));
+}
+function goToComponent(id){
+  switchView('component');
+  document.getElementById('component-search').value = id;
+  renderComponent(id);
+}
+function renderComponent(id){
+  const c = COMPONENTS.find(x=>x.component_id===id);
+  if(!c) return;
+  document.getElementById('metric-stack').innerHTML = `
+    <div class="metric-box"><div class="k">Anomaly Score</div><div class="v" style="color:${thermalColor(c.anomaly_score)}">${c.anomaly_score.toFixed(1)} / 100</div></div>
+    <div class="metric-box"><div class="k">Lot</div><div class="v">${c.lot_id}</div></div>
+    <div class="metric-box"><div class="k">168h Actual</div><div class="v">${c.Value_168h.toFixed(2)} µA</div></div>
+    <div class="metric-box"><div class="k">168h Predicted</div><div class="v">${c.predicted_168h.toFixed(2)} µA</div></div>
+    <div class="metric-box"><div class="k">Status</div><div class="v">${c.final_flag?'<span style="color:var(--red)">FLAGGED</span>':'<span style="color:var(--teal)">NOMINAL</span>'}</div></div>
+  `;
+  drawDriftChart(c);
+  const banner = document.getElementById('explain-banner');
+  banner.style.animation = 'none'; void banner.offsetWidth; banner.style.animation = '';
+  if(c.final_flag){
+    banner.className = 'explain-banner';
+    banner.innerHTML = `<span class="tag">Flag Reasoning</span>${c.explanation}`;
+  } else {
+    banner.className = 'explain-banner ok';
+    banner.innerHTML = `<span class="tag">Assessment</span>No anomaly detected — component tracked within expected lot-relative and predicted-drift bounds.`;
+  }
+}
+function drawDriftChart(c){
+  const svg = document.getElementById('drift-svg');
+  const W=560,H=220, padL=42, padR=16, padT=16, padB=30;
+  const xs=[0,24,96,168];
+  const actual=[c.Value_0h,c.Value_24h,c.Value_96h,c.Value_168h];
+  const allVals = actual.concat([c.predicted_168h]);
+  const yMin = Math.min(...allVals)*0.85, yMax = Math.max(...allVals)*1.15;
+  const x = v => padL + (v/168)*(W-padL-padR);
+  const y = v => H-padB - ((v-yMin)/(yMax-yMin))*(H-padT-padB);
+
+  let grid='';
+  for(let i=0;i<=4;i++){
+    const gy = padT + i*(H-padT-padB)/4;
+    grid += `<line x1="${padL}" y1="${gy}" x2="${W-padR}" y2="${gy}" stroke="#1A2029" stroke-width="1"/>`;
+  }
+  xs.forEach(hx=>{
+    grid += `<text x="${x(hx)}" y="${H-10}" fill="#565F6E" font-size="10" font-family="IBM Plex Mono, monospace" text-anchor="middle">${hx}h</text>`;
+  });
+
+  const areaPath = `M${x(0)},${H-padB} ` + actual.map((v,i)=>`L${x(xs[i])},${y(v)}`).join(' ') + ` L${x(168)},${H-padB} Z`;
+  const actualPath = actual.map((v,i)=>`${i===0?'M':'L'}${x(xs[i])},${y(v)}`).join(' ');
+  const predPath = `M${x(24)},${y(c.Value_24h)} L${x(168)},${y(c.predicted_168h)}`;
+  const dots = actual.map((v,i)=>`<circle cx="${x(xs[i])}" cy="${y(v)}" r="3.5" fill="#3FD8C4"/>`).join('');
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3FD8C4" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="#3FD8C4" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    ${grid}
+    <path d="${areaPath}" fill="url(#areaGrad)" stroke="none"/>
+    <path id="actualLine" d="${actualPath}" fill="none" stroke="#3FD8C4" stroke-width="2.4" stroke-linejoin="round"/>
+    <path id="predLine" d="${predPath}" fill="none" stroke="#FF9B4D" stroke-width="2" stroke-dasharray="5,4"/>
+    ${dots}
+    <circle cx="${x(168)}" cy="${y(c.predicted_168h)}" r="3.5" fill="#FF9B4D"/>
+  `;
+
+  if(!REDUCED_MOTION){
+    ['actualLine','predLine'].forEach((id)=>{
+      const path = document.getElementById(id);
+      const len = path.getTotalLength();
+      path.style.strokeDasharray = len;
+      path.style.strokeDashoffset = len;
+      path.getBoundingClientRect();
+      const dashed = id==='predLine';
+      path.style.transition = `stroke-dashoffset ${dashed?0.7:0.9}s var(--ease) ${dashed?0.35:0}s`;
+      requestAnimationFrame(()=>{ path.style.strokeDashoffset = 0; });
+    });
+  }
+}
+
+function initPredictor(){
+  const sel = document.getElementById('predict-lot');
+  sel.innerHTML = LOTS.map(l=>`<option value="${l.lot_id}">${l.lot_id}</option>`).join('');
+  document.getElementById('predict-btn').addEventListener('click', runPrediction);
+}
+function lotMean0h(lotId){
+  const comps = COMPONENTS.filter(c=>c.lot_id===lotId);
+  return comps.reduce((s,c)=>s+c.Value_0h,0)/comps.length;
+}
+function drawGauge(ratio, flagged){
+  const svg = document.getElementById('gauge-svg');
+  const cx=48, cy=48, r=38, start=-130, end=130;
+  const clamped = Math.max(0, Math.min(1, ratio));
+  const angle = start + clamped*(end-start);
+  function polar(a){ const rad=(a-90)*Math.PI/180; return [cx+r*Math.cos(rad), cy+r*Math.sin(rad)]; }
+  function arcPath(a0,a1){
+    const [x0,y0]=polar(a0), [x1,y1]=polar(a1);
+    const large = (a1-a0)>180?1:0;
+    return `M${x0},${y0} A${r},${r} 0 ${large} 1 ${x1},${y1}`;
+  }
+  const color = flagged ? '#FF4D4D' : '#3FD8C4';
+  svg.innerHTML = `
+    <path d="${arcPath(start,end)}" fill="none" stroke="#1A2029" stroke-width="7" stroke-linecap="round"/>
+    <path id="gaugeFill" d="${arcPath(start,start)}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="3" fill="${color}"/>
+  `;
+  const fill = document.getElementById('gaugeFill');
+  if(REDUCED_MOTION){
+    fill.setAttribute('d', arcPath(start,angle));
+    return;
+  }
+  let t0=null; const dur=650;
+  function step(ts){
+    if(!t0) t0=ts;
+    const p = Math.min((ts-t0)/dur,1);
+    const eased = 1-Math.pow(1-p,3);
+    const a = start + eased*(angle-start);
+    fill.setAttribute('d', arcPath(start,a));
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+function runPrediction(){
+  const lotId = document.getElementById('predict-lot').value;
+  const v0 = parseFloat(document.getElementById('predict-0h').value);
+  const v24 = parseFloat(document.getElementById('predict-24h').value);
+  const lotMean0 = lotMean0h(lotId);
+
+  const delta24 = v24 - v0;
+  const pctChange = v0 !== 0 ? delta24/v0 : 0;
+  const slope024 = delta24/24;
+
+  const features = {
+    Value_0h: v0, Value_24h: v24, delta_24h: delta24,
+    pct_change_24h: pctChange, slope_0_24: slope024, lot_mean_0h: lotMean0
+  };
+  let predicted168 = LIN_INTERCEPT;
+  const contributions = {};
+  for(const k in LIN_COEF){
+    const contrib = LIN_COEF[k]*features[k];
+    predicted168 += contrib;
+    contributions[k] = contrib;
+  }
+  const predictedSlope = (predicted168 - v24)/(168-24);
+  const flagged = predictedSlope > SAFETY_SLOPE;
+  const topFeature = Object.keys(contributions).reduce((a,b)=>Math.abs(contributions[a])>Math.abs(contributions[b])?a:b);
+
+  const verdict = document.getElementById('verdict');
+  const badge = document.getElementById('verdict-badge');
+  const detail = document.getElementById('verdict-detail');
+  verdict.classList.remove('show'); void verdict.offsetWidth;
+
+  if(flagged){
+    badge.className='verdict-badge reject'; badge.textContent='REJECT';
+    detail.innerHTML = `Predicted <b>${predicted168.toFixed(2)} µA</b> at 168h — drift slope <b>${predictedSlope.toFixed(4)} µA/hr</b> exceeds the safety threshold of <b>${SAFETY_SLOPE} µA/hr</b>. Strongest driver: <b>${topFeature}</b> (contributed ${contributions[topFeature].toFixed(2)} µA). Recommend early rejection — do not continue to 168h.`;
+  } else {
+    badge.className='verdict-badge pass'; badge.textContent='PASS';
+    detail.innerHTML = `Predicted <b>${predicted168.toFixed(2)} µA</b> at 168h — drift slope <b>${predictedSlope.toFixed(4)} µA/hr</b> is within the safety threshold of <b>${SAFETY_SLOPE} µA/hr</b>. Component tracking within nominal bounds for this lot.`;
+  }
+  verdict.classList.add('show');
+  const ratio = predictedSlope / (SAFETY_SLOPE*2.4);
+  drawGauge(ratio, flagged);
+}
+
+runBoot();
+</script>
+</body>
+</html>
