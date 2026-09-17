@@ -61,8 +61,10 @@ def zscore_flags(df: pd.DataFrame, parameter: str = None, threshold: float = 3.0
     return out
 
 
-def iqr_flags(df: pd.DataFrame, parameter: str = None, k: float = 2.0) -> pd.DataFrame:
-    """Per-lot IQR outlier detection on one parameter's 168h value."""
+def iqr_flags(df: pd.DataFrame, parameter: str = None, k: float = 2.0, direction: str = "upper") -> pd.DataFrame:
+    """Per-lot IQR outlier detection on one parameter's 168h value.
+    In burn-in screening, degradation manifests as elevated drift (positive/upper departure).
+    direction='upper' flags components exceeding upper IQR limit; direction='two_sided' flags both."""
     out = df.copy()
     col168 = value_col(168, parameter)
     suf = _suffix(parameter)
@@ -79,7 +81,10 @@ def iqr_flags(df: pd.DataFrame, parameter: str = None, k: float = 2.0) -> pd.Dat
     lower = bounds.apply(lambda x: x[0]).rename(lower_col)
     upper = bounds.apply(lambda x: x[1]).rename(upper_col)
     out = out.merge(lower, on="lot_id", how="left").merge(upper, on="lot_id", how="left")
-    out[flag_col] = (out[col168] < out[lower_col]) | (out[col168] > out[upper_col])
+    if direction == "upper":
+        out[flag_col] = out[col168] > out[upper_col]
+    else:
+        out[flag_col] = (out[col168] < out[lower_col]) | (out[col168] > out[upper_col])
     return out
 
 
@@ -87,6 +92,7 @@ def isolation_forest_flags(
     df: pd.DataFrame,
     parameters,
     contamination: float = 0.02,
+    score_threshold: float = -0.03,
     random_state: int = 42,
 ) -> pd.DataFrame:
     """
@@ -113,12 +119,19 @@ def isolation_forest_flags(
         preds = model.predict(X)
 
         out.loc[group.index, "if_score"] = scores
-        out.loc[group.index, "flag_isoforest"] = preds == -1
+        out.loc[group.index, "flag_isoforest"] = (preds == -1) & (scores < score_threshold)
 
     return out
 
 
-def run_module_a(df: pd.DataFrame, parameters=None, contamination: float = 0.02, iqr_k: float = 2.0) -> pd.DataFrame:
+def run_module_a(
+    df: pd.DataFrame,
+    parameters=None,
+    contamination: float = 0.02,
+    iqr_k: float = 2.0,
+    iqr_direction: str = "upper",
+    if_score_threshold: float = -0.03,
+) -> pd.DataFrame:
     """
     Full Module A pipeline across every parameter present in `df`.
     parameters=None auto-detects from column names (multi- or
@@ -130,9 +143,11 @@ def run_module_a(df: pd.DataFrame, parameters=None, contamination: float = 0.02,
     out = df.copy()
     for p in parameters:
         out = zscore_flags(out, parameter=p)
-        out = iqr_flags(out, parameter=p, k=iqr_k)
+        out = iqr_flags(out, parameter=p, k=iqr_k, direction=iqr_direction)
 
-    out = isolation_forest_flags(out, parameters, contamination=contamination)
+    out = isolation_forest_flags(
+        out, parameters, contamination=contamination, score_threshold=if_score_threshold
+    )
 
     # Per-parameter combined flag (z OR iqr for that parameter). Uses
     # _suffix() so legacy single-parameter mode produces exactly

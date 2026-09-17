@@ -66,7 +66,7 @@ def load_artifacts():
     for p in parameters:
         label = _param_label(p)
         xgb_models[label] = joblib.load(f"{OUTPUTS_DIR}/xgb_model_{label}.joblib")
-        safety_slopes[label] = compute_safety_slope(wide_df, parameter=p, percentile=99.5)
+        safety_slopes[label] = compute_safety_slope(wide_df, parameter=p, percentile=99.8)
         param_by_label[label] = p
 
     _state["wide_df"] = wide_df

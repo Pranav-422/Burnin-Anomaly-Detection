@@ -94,7 +94,7 @@ def test_module_b_mae_on_holdout(holdout_df, train_df, parameter_and_model):
     a flat absolute number that wouldn't mean the same thing across
     different units."""
     parameter, model = parameter_and_model
-    threshold_slope = compute_safety_slope(train_df, parameter=parameter, percentile=99.5)
+    threshold_slope = compute_safety_slope(train_df, parameter=parameter, percentile=99.8)
     result = predict_and_flag(holdout_df, model, threshold_slope, parameter=parameter)
     suf = f"_{parameter}"
     mae = mean_absolute_error(result[f"Value_168h{suf}"], result[f"predicted_168h{suf}"])
@@ -116,7 +116,7 @@ def test_combined_recall_on_holdout(holdout_df, train_df):
     for p in parameters:
         label = _param_label(p)
         model = joblib.load(f"outputs/xgb_model_{label}.joblib")
-        threshold = compute_safety_slope(train_df, parameter=p, percentile=99.5)
+        threshold = compute_safety_slope(train_df, parameter=p, percentile=99.8)
         pred = predict_and_flag(holdout_df, model, threshold, parameter=p)
         suf = "" if p is None else f"_{p}"
         combined_flag = combined_flag | pred[f"flag_param_b{suf}"]
@@ -129,4 +129,4 @@ def test_combined_recall_on_holdout(holdout_df, train_df):
     print(f"\nCombined (A OR B, all parameters) on HOLDOUT: recall={recall:.1%}, "
           f"precision={precision:.1%}, TP={tp}, FN={fn}, FP={fp}")
     assert recall >= 0.90, f"Combined recall on holdout dropped to {recall:.1%} (expected >=90%)"
-    assert precision >= 0.55, f"Combined precision on holdout is too low ({precision:.1%}, expected >=55%)"
+    assert precision >= 0.70, f"Combined precision on holdout is too low ({precision:.1%}, expected >=70%)"

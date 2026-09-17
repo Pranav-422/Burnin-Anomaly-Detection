@@ -115,12 +115,12 @@ def train_models(df: pd.DataFrame, parameter: str = None, random_state: int = 42
     return lin_model, xgb_model, report
 
 
-def compute_safety_slope(df: pd.DataFrame, parameter: str = None, percentile: float = 99.5) -> float:
+def compute_safety_slope(df: pd.DataFrame, parameter: str = None, percentile: float = 99.8) -> float:
     """
     Derives the safety-slope threshold for ONE parameter, empirically,
     from the KNOWN-GOOD population's actual (24h->168h) drift slope.
     Each parameter gets its OWN threshold since units/scales differ.
-    Defaults to 99.5th percentile (~3-sigma normal variation limit).
+    Defaults to 99.8th percentile (~3.1-sigma normal variation limit).
     """
     c24, c168 = value_col(24, parameter), value_col(168, parameter)
     good = df[~df["is_defective"]] if "is_defective" in df.columns else df
@@ -150,7 +150,7 @@ def predict_and_flag(df: pd.DataFrame, model, safety_slope_threshold: float, par
     return df
 
 
-def train_and_predict_all(df: pd.DataFrame, parameters=None, percentile: float = 99.5, random_state: int = 42):
+def train_and_predict_all(df: pd.DataFrame, parameters=None, percentile: float = 99.8, random_state: int = 42):
     """
     Orchestrates Module B across every parameter present in `df`.
     Returns (result_df, reports_dict, models_dict) where result_df has

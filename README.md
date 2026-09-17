@@ -83,15 +83,17 @@ This writes to `outputs/`:
 |---|---|
 | Combined recall (defects caught) | 100% |
 | False negatives | 0 |
-| Module A precision | 84.7% (59 flagged / 50 real defects) |
-| Module B precision | 90.9% (55 flagged / 50 real defects) |
-| Precision (combined) | 79.4% (63 flagged / 50 real defects) |
+| Overall classification accuracy | 99.6% (996/1000 correct) |
+| Module A precision | 94.3% (53 flagged / 50 real defects) |
+| Module B precision | 96.2% (52 flagged / 50 real defects) |
+| Precision (combined) | 92.6% (54 flagged / 50 real defects) |
+| Combined F1-Score | 96.2% |
 | Module B test-set MAE | leakage ~0.36µA · Iddq ~0.64µA · prop delay ~0.13ns |
 
 Thresholds are calibrated according to statistical process control (SPC) principles:
-- **Module A IQR**: $k=2.0$ (extreme quartile departure) and Z-score $|Z| \ge 3.0\sigma$.
-- **Module A Isolation Forest**: contamination rate set to $0.02$ (matching expected latent defect frequency) to prevent forced false alarms on clean lots.
-- **Module B Safety Slope**: 99.5th percentile (~$3\sigma$ upper process limit) on known-good baseline drift rates, eliminating false alarms on healthy drift.
+- **Module A IQR**: Upper quartile departure $k=2.0$ aligned with physical degradation direction (elevated drift) and Z-score $|Z| \ge 3.0\sigma$.
+- **Module A Isolation Forest**: Contamination rate $0.02$ with score margin filter ($<-0.03$) to prevent quota-driven false alarms on clean lots.
+- **Module B Safety Slope**: 99.8th percentile (~$3.1\sigma$ upper process limit) on known-good baseline drift rates, eliminating false alarms on normal operating drift.
 
 MAE above is reported strictly on the held-out **test split**, never by re-predicting on the full
 training dataset — that was a real bug in an earlier single-parameter version (inflated apparent

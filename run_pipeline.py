@@ -65,7 +65,7 @@ def main():
               f"(n_test={report['n_test']})")
         print(f"[{label}] XGBoost TEST-SET MAE:           {report['xgboost_test_mae']}  "
               f"(n_test={report['n_test']})")
-        print(f"[{label}] Safety slope threshold (99.5th pct known-good): "
+        print(f"[{label}] Safety slope threshold (99.8th pct known-good): "
               f"{report['safety_slope_threshold']}")
         print()
 
