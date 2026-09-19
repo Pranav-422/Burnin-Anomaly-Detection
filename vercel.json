@@ -29,6 +29,14 @@
     {
       "source": "/dashboard/:path*",
       "destination": "/dashboard/static/:path*"
+    },
+    {
+      "source": "/data_store.js",
+      "destination": "/dashboard/static/data_store.js"
+    },
+    {
+      "source": "/api/export/report",
+      "destination": "/dashboard/static/ASTROLAB_BurnIn_Screening_Report.csv"
     }
   ]
 }

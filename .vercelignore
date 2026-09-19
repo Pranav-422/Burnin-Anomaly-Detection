@@ -9,6 +9,6 @@ module_b/
 explainability/
 data/
 *.joblib
-*.csv
+outputs/*.csv
 Procfile
 render.yaml
