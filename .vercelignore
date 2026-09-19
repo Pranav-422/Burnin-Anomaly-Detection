@@ -1,0 +1,14 @@
+# Tell Vercel to ignore Python backend so it doesn't try to build a 800MB serverless function
+api/
+requirements.txt
+runtime.txt
+outputs/
+tests/
+module_a/
+module_b/
+explainability/
+data/
+*.joblib
+*.csv
+Procfile
+render.yaml
