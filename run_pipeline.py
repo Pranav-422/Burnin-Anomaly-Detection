@@ -20,7 +20,8 @@ from module_a.anomaly_detection import run_module_a
 from module_b.drift_predictor import train_and_predict_all
 from explainability.shap_utils import build_full_report
 
-OUT_DIR = "outputs"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+OUT_DIR = os.path.join(BASE_DIR, "outputs")
 
 
 def main():

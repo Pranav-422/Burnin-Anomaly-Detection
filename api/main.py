@@ -57,6 +57,15 @@ _state = {}
 
 @app.on_event("startup")
 def load_artifacts():
+    required_files = [
+        os.path.join(OUTPUTS_DIR, "burnin_data_wide.csv"),
+        os.path.join(OUTPUTS_DIR, "final_report.csv"),
+    ]
+    if not all(os.path.isfile(f) for f in required_files):
+        print("Required artifacts missing in outputs/. Running data & ML pipeline now...")
+        from run_pipeline import main as run_pipeline_main
+        run_pipeline_main()
+
     wide_df = pd.read_csv(f"{OUTPUTS_DIR}/burnin_data_wide.csv")
     parameters = detect_parameters(wide_df)  # e.g. ["iddq_ua","leakage_ua","prop_delay_ns"], or [None] legacy
 
@@ -557,3 +566,9 @@ def get_lot_summary(lot_id: str):
 def list_lots():
     report = _state["final_report"]
     return sorted(report["lot_id"].unique().tolist())
+
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("api.main:app", host="0.0.0.0", port=port, reload=False)

@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/dashboard/static/home.html"
+    },
+    {
+      "source": "/home",
+      "destination": "/dashboard/static/home.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/dashboard/static/about.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/dashboard/static/login.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard/static/index.html"
+    },
+    {
+      "source": "/dashboard/",
+      "destination": "/dashboard/static/index.html"
+    },
+    {
+      "source": "/dashboard/:path*",
+      "destination": "/dashboard/static/:path*"
+    }
+  ]
+}

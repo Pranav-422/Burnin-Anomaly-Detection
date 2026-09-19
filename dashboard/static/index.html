@@ -141,7 +141,7 @@
 
 <script>
 // ==================== CONFIG & STATE ====================
-const API_BASE = window.location.origin;
+const API_BASE = window.ASTROLAB_API_BASE || localStorage.getItem('astrolab_api_url') || window.location.origin;
 let state = {
   currentPage: 'overview',
   overview: null,

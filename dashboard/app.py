@@ -42,7 +42,11 @@ st.set_page_config(page_title="Burn-In Anomaly Detection - QA Dashboard", layout
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv(f"{OUT_DIR}/final_report.csv")
+    report_file = os.path.join(OUT_DIR, "final_report.csv")
+    if not os.path.isfile(report_file):
+        from run_pipeline import main as run_pipeline_main
+        run_pipeline_main()
+    df = pd.read_csv(report_file)
     parameters = detect_parameters(df)
     return df, parameters
 
