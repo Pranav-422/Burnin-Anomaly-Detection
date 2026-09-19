@@ -4,27 +4,27 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/dashboard/static/home.html"
+      "destination": "/dashboard/static/home"
     },
     {
       "source": "/home",
-      "destination": "/dashboard/static/home.html"
+      "destination": "/dashboard/static/home"
     },
     {
       "source": "/about",
-      "destination": "/dashboard/static/about.html"
+      "destination": "/dashboard/static/about"
     },
     {
       "source": "/login",
-      "destination": "/dashboard/static/login.html"
+      "destination": "/dashboard/static/login"
     },
     {
       "source": "/dashboard",
-      "destination": "/dashboard/static/index.html"
+      "destination": "/dashboard/static"
     },
     {
       "source": "/dashboard/",
-      "destination": "/dashboard/static/index.html"
+      "destination": "/dashboard/static"
     },
     {
       "source": "/dashboard/:path*",
