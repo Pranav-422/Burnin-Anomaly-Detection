@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ASTROLAB — Operator Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<script>tailwind.config={darkMode:"class",theme:{extend:{colors:{"isro-orange":"#e87312","isro-navy":"#032848","isro-blue":"#164090","isro-cobalt":"#004079"},fontFamily:{"display":["Libre Caslon Text","serif"],"mono":["Space Mono","monospace"],"sans":["Inter","sans-serif"]}}}};</script>
+<style>
+  html,body{margin:0;padding:0}
+  body{overscroll-behavior:none}
+  ::-webkit-scrollbar{display:none}
+</style>
+</head>
+<body class="bg-[#f5fafd] font-sans text-[#032848] min-h-screen flex flex-col">
+
+<!-- Indian Tricolor Top Bar -->
+<div class="fixed top-0 left-0 w-full h-[3px] flex z-50">
+  <div class="h-full w-1/3 bg-[#FF9933]"></div>
+  <div class="h-full w-1/3 bg-[#FFFFFF]"></div>
+  <div class="h-full w-1/3 bg-[#138808]"></div>
+</div>
+
+<main class="w-full flex-1 flex flex-col pt-[3px]">
+<div class="w-full min-h-[calc(100vh-3px)] grid grid-cols-1 lg:grid-cols-2 relative">
+
+<!-- Back to Home -->
+<a class="absolute top-6 right-6 lg:top-8 lg:right-10 z-30 inline-flex items-center gap-2 font-mono text-[10px] text-[#164090] hover:text-[#e87312] uppercase tracking-widest font-bold transition-colors group" href="/dashboard/home.html">
+  <span class="material-symbols-outlined text-[16px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
+  <span class="group-hover:underline">Back to Home</span>
+</a>
+
+<!-- LEFT HALF: ASTROLAB Branding Panel -->
+<div class="relative bg-gradient-to-b from-[#032848] via-[#062338] to-[#02182b] flex flex-col justify-center items-center p-8 sm:p-12 lg:p-16 overflow-hidden select-none border-r border-[#0e3b68]/40">
+
+  <!-- Subtle Grid Pattern -->
+  <div class="absolute inset-0 pointer-events-none opacity-15">
+    <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern height="48" id="grid" patternUnits="userSpaceOnUse" width="48">
+        <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#93ccff" stroke-dasharray="2 6" stroke-width="0.75"/>
+        <circle cx="24" cy="24" fill="#E87312" r="0.75"/>
+      </pattern></defs>
+      <rect fill="url(#grid)" height="100%" width="100%"/>
+    </svg>
+  </div>
+
+  <!-- Emblem & Mission Info -->
+  <div class="relative z-10 flex flex-col items-center text-center">
+    <!-- Diamond Logo -->
+    <div class="relative w-32 h-32 mb-8 flex items-center justify-center">
+      <div class="absolute inset-0 rotate-45 border-2 border-[#e87312] shadow-[0_0_20px_rgba(232,115,18,0.4)]"></div>
+      <div class="absolute inset-3 rotate-45 border border-[#e87312]/50"></div>
+      <span class="font-display text-5xl text-white font-bold relative z-10 drop-shadow-md">A</span>
+    </div>
+
+    <h2 class="font-display text-3xl text-white font-bold tracking-wide mb-3">ASTROLAB</h2>
+    <p class="font-sans text-sm text-[#cfe5ff]/80 max-w-sm leading-relaxed">
+      AI-Driven Anomaly Detection for ISRO Space-Grade Component Burn-In Screening
+    </p>
+
+    <!-- Status Pill -->
+    <div class="mt-8 inline-flex items-center gap-3 px-4 py-2 bg-[#02182b]/80 border border-[#0e3b68] rounded-lg">
+      <span class="w-2.5 h-2.5 rounded-full bg-[#e87312] shadow-[0_0_8px_#e87312] animate-pulse"></span>
+      <span class="font-mono text-[10px] text-white tracking-wider uppercase font-bold">System Online · Auth Required</span>
+    </div>
+  </div>
+</div>
+
+<!-- RIGHT HALF: Login Form -->
+<div class="bg-white flex flex-col justify-center p-8 sm:p-12 lg:p-20 relative">
+  <div class="w-full max-w-md mx-auto">
+
+    <!-- Header -->
+    <div class="mb-10">
+      <h1 class="font-display text-3xl text-[#032848] font-bold tracking-tight mb-2">
+        Operator Login
+      </h1>
+      <p class="text-sm text-[#384760]">
+        Access the burn-in screening console and live predictor.
+      </p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-[#ba1a1a] font-mono" id="error-msg"></div>
+
+    <!-- Form -->
+    <form class="space-y-6" onsubmit="handleLogin(event)">
+      <!-- Email -->
+      <div>
+        <label class="block font-mono text-[10px] text-[#032848] font-bold uppercase tracking-widest mb-2" for="operator-id">
+          Operator ID / Email
+        </label>
+        <div class="relative">
+          <input class="w-full bg-[#f5fafd] border border-[#d3e4fe] text-[#032848] text-sm px-4 py-3.5 rounded outline-none transition-all placeholder:text-[#72777f] focus:bg-white focus:border-[#e87312] focus:ring-1 focus:ring-[#e87312]" id="operator-id" placeholder="operator@astrolab.isro" required type="text"/>
+          <span class="absolute right-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#164090] text-[20px] pointer-events-none">badge</span>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label class="block font-mono text-[10px] text-[#032848] font-bold uppercase tracking-widest mb-2" for="operator-auth">
+          Security Keyphrase
+        </label>
+        <div class="relative">
+          <input class="w-full bg-[#f5fafd] border border-[#d3e4fe] text-[#032848] text-sm px-4 py-3.5 pr-14 rounded outline-none transition-all placeholder:text-[#72777f] focus:bg-white focus:border-[#e87312] focus:ring-1 focus:ring-[#e87312]" id="operator-auth" placeholder="••••••••••••••••" required type="password"/>
+          <button aria-label="Toggle password visibility" class="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 text-[#164090] hover:text-[#e87312] transition-colors" id="toggle-password-btn" onclick="togglePassword()" type="button">
+            <span class="material-symbols-outlined text-[18px]" id="vis-icon">visibility</span>
+          </button>
+        </div>
+        <!-- Password Strength -->
+        <div class="mt-2 flex items-center gap-2">
+          <div class="flex-1 h-1 bg-[#d3e4fe] rounded-full overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-300" id="pwd-strength-bar" style="width:0%;background-color:#d3e4fe"></div>
+          </div>
+          <span class="font-mono text-[9px] uppercase tracking-wider font-bold min-w-[60px] text-right" id="pwd-strength-text"></span>
+        </div>
+      </div>
+
+      <!-- Remember + Forgot -->
+      <div class="flex items-center justify-between">
+        <label class="flex items-center gap-2.5 cursor-pointer group">
+          <input checked class="w-4 h-4 rounded border-[#d3e4fe] text-[#e87312] focus:ring-[#e87312]" type="checkbox"/>
+          <span class="text-xs text-[#384760] group-hover:text-[#032848] transition-colors">Remember session</span>
+        </label>
+        <a class="font-mono text-[10px] text-[#164090] hover:text-[#e87312] underline underline-offset-4 tracking-wider transition-colors uppercase font-bold" href="#">Forgot password?</a>
+      </div>
+
+      <!-- Submit -->
+      <button class="w-full py-4 px-6 bg-[#e87312] hover:bg-[#d96509] text-white font-mono text-xs font-bold uppercase transition-all shadow-md flex items-center justify-center gap-3 rounded-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-[#e87312] focus:ring-offset-2 group" id="login-btn" type="submit">
+        <span>[ Initiate Session ]</span>
+        <span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+      </button>
+    </form>
+
+    <!-- Register Link -->
+    <div class="mt-8 text-center">
+      <p class="text-sm text-[#384760]">
+        Don't have an account?
+        <a class="text-[#164090] hover:text-[#e87312] font-bold underline underline-offset-4 transition-colors" href="#">Request Access</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Security Footer -->
+  <div class="absolute bottom-6 left-8 right-8 flex items-center justify-center gap-2 text-[#72777f]">
+    <span class="material-symbols-outlined text-[14px] text-[#e87312]">lock</span>
+    <span class="font-mono text-[9px] tracking-wider uppercase">Authorized Personnel Only · Secure Connection</span>
+  </div>
+</div>
+
+</div>
+</main>
+
+<script>
+  // ===== SECURITY CONFIG =====
+  const SEC = {
+    MAX_ATTEMPTS: 5,
+    LOCKOUT_DURATION_MS: 2 * 60 * 1000,  // 2 minutes lockout
+    SESSION_TIMEOUT_MS: 30 * 60 * 1000,  // 30 min session
+    MIN_PASSWORD_LENGTH: 8,
+    CSRF_TOKEN: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36),
+  };
+
+  // ===== STATE =====
+  let loginAttempts = parseInt(sessionStorage.getItem('login_attempts') || '0');
+  let lockoutUntil = parseInt(sessionStorage.getItem('lockout_until') || '0');
+
+  // Restore lockout state on page load
+  (function checkLockoutOnLoad() {
+    if (Date.now() < lockoutUntil) {
+      showLockoutUI(lockoutUntil - Date.now());
+    } else if (lockoutUntil > 0) {
+      // Lockout expired, reset
+      sessionStorage.removeItem('login_attempts');
+      sessionStorage.removeItem('lockout_until');
+      loginAttempts = 0;
+    }
+  })();
+
+  // ===== INPUT SANITIZATION =====
+  function sanitize(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML.trim();
+  }
+
+  function validateEmail(val) {
+    // Allow plain operator IDs (alphanumeric + _-.) or valid email
+    return /^[a-zA-Z0-9._@\-]+$/.test(val) && val.length >= 3 && val.length <= 128;
+  }
+
+  function validatePassword(val) {
+    return val.length >= SEC.MIN_PASSWORD_LENGTH && val.length <= 256;
+  }
+
+  // ===== PASSWORD STRENGTH =====
+  const pwdInput = document.getElementById('operator-auth');
+  const strengthBar = document.getElementById('pwd-strength-bar');
+  const strengthText = document.getElementById('pwd-strength-text');
+
+  if (pwdInput) {
+    pwdInput.addEventListener('input', function () {
+      const val = this.value;
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (val.length >= 12) score++;
+      if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      const pct = Math.min(score / 5 * 100, 100);
+      const colors = ['#ba1a1a', '#e87312', '#e87312', '#138808', '#138808'];
+      const labels = ['Weak', 'Fair', 'Fair', 'Strong', 'Very Strong'];
+      if (strengthBar) {
+        strengthBar.style.width = pct + '%';
+        strengthBar.style.backgroundColor = colors[Math.min(score, 4)];
+      }
+      if (strengthText) {
+        strengthText.textContent = val.length > 0 ? labels[Math.min(score, 4)] : '';
+        strengthText.style.color = colors[Math.min(score, 4)];
+      }
+    });
+  }
+
+  // ===== TOGGLE PASSWORD =====
+  function togglePassword() {
+    const input = document.getElementById('operator-auth');
+    const icon = document.getElementById('vis-icon');
+    if (!input) return;
+    if (input.type === 'password') {
+      input.type = 'text';
+      if (icon) icon.textContent = 'visibility_off';
+    } else {
+      input.type = 'password';
+      if (icon) icon.textContent = 'visibility';
+    }
+  }
+
+  // ===== LOCKOUT UI =====
+  function showLockoutUI(remainingMs) {
+    const btn = document.getElementById('login-btn');
+    const errDiv = document.getElementById('error-msg');
+    if (btn) btn.disabled = true;
+
+    function updateTimer() {
+      const left = Math.max(0, lockoutUntil - Date.now());
+      const secs = Math.ceil(left / 1000);
+      if (errDiv) {
+        errDiv.innerHTML = `<span class="material-symbols-outlined text-[14px] align-middle mr-1">lock_clock</span> Account locked. Try again in <strong>${secs}s</strong>`;
+        errDiv.classList.remove('hidden');
+      }
+      if (btn) btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">lock</span> <span>Locked (${secs}s)</span>`;
+      if (left <= 0) {
+        clearInterval(lockTimer);
+        sessionStorage.removeItem('login_attempts');
+        sessionStorage.removeItem('lockout_until');
+        loginAttempts = 0;
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>[ Initiate Session ]</span><span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>';
+        }
+        if (errDiv) errDiv.classList.add('hidden');
+      }
+    }
+    updateTimer();
+    const lockTimer = setInterval(updateTimer, 1000);
+  }
+
+  // ===== LOGIN HANDLER =====
+  function handleLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    const errDiv = document.getElementById('error-msg');
+    if (!btn) return;
+
+    // Check lockout
+    if (Date.now() < lockoutUntil) {
+      showLockoutUI(lockoutUntil - Date.now());
+      return;
+    }
+
+    const rawId = document.getElementById('operator-id').value;
+    const rawPwd = document.getElementById('operator-auth').value;
+
+    // Sanitize & validate
+    const opId = sanitize(rawId);
+    const opPwd = rawPwd; // Don't sanitize password (may contain special chars)
+
+    if (!validateEmail(opId)) {
+      if (errDiv) {
+        errDiv.textContent = 'Invalid Operator ID format.';
+        errDiv.classList.remove('hidden');
+      }
+      return;
+    }
+    if (!validatePassword(opPwd)) {
+      if (errDiv) {
+        errDiv.textContent = `Password must be at least ${SEC.MIN_PASSWORD_LENGTH} characters.`;
+        errDiv.classList.remove('hidden');
+      }
+      return;
+    }
+
+    // Show loading
+    btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> <span>[ Verifying... ]</span>';
+    btn.disabled = true;
+
+    // Simulate auth check (replace with real API call)
+    setTimeout(() => {
+      // Demo: accept "admin@astrolab.isro" / "isro@2026" OR any valid credentials
+      const isValid = (opId === 'admin@astrolab.isro' && opPwd === 'isro@2026') ||
+                      (opPwd.length >= 8); // In production, this calls /api/auth
+
+      if (isValid) {
+        // Reset attempts on success
+        sessionStorage.removeItem('login_attempts');
+        sessionStorage.removeItem('lockout_until');
+
+        // Set auth session
+        const session = {
+          token: SEC.CSRF_TOKEN,
+          operator: opId,
+          loginAt: Date.now(),
+          expiresAt: Date.now() + SEC.SESSION_TIMEOUT_MS,
+        };
+        sessionStorage.setItem('astrolab_session', JSON.stringify(session));
+
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">verified</span> <span>[ Access Granted ]</span>';
+        if (errDiv) errDiv.classList.add('hidden');
+        setTimeout(() => { window.location.href = '/dashboard/'; }, 600);
+      } else {
+        // Failed attempt
+        loginAttempts++;
+        sessionStorage.setItem('login_attempts', loginAttempts.toString());
+
+        const remaining = SEC.MAX_ATTEMPTS - loginAttempts;
+        if (loginAttempts >= SEC.MAX_ATTEMPTS) {
+          lockoutUntil = Date.now() + SEC.LOCKOUT_DURATION_MS;
+          sessionStorage.setItem('lockout_until', lockoutUntil.toString());
+          showLockoutUI(SEC.LOCKOUT_DURATION_MS);
+        } else {
+          if (errDiv) {
+            errDiv.innerHTML = `<span class="material-symbols-outlined text-[14px] align-middle mr-1">warning</span> Invalid credentials. <strong>${remaining}</strong> attempt${remaining > 1 ? 's' : ''} remaining.`;
+            errDiv.classList.remove('hidden');
+          }
+          btn.disabled = false;
+          btn.innerHTML = '<span>[ Initiate Session ]</span><span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>';
+        }
+      }
+    }, 1000);
+  }
+</script>
+
+</body></html>

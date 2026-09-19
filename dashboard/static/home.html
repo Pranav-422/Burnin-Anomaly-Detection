@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ASTROLAB — AI-Driven Burn-In Anomaly Detection</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={darkMode:"class",theme:{extend:{colors:{"isro-orange":"#e87312","isro-navy":"#032848","isro-blue":"#164090","isro-cobalt":"#004079"},fontFamily:{"display":["Libre Caslon Text","serif"],"mono":["Space Mono","monospace"],"sans":["Inter","sans-serif"]}}}};</script>
+<style>
+  html,body{margin:0;padding:0}
+  body{overscroll-behavior:none}
+  ::-webkit-scrollbar{display:none}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+</style>
+</head>
+<body class="bg-[#f5fafd] font-sans text-[#032848] min-h-screen">
+
+<!-- Indian Tricolor Top Bar -->
+<div class="fixed top-0 left-0 w-full h-[3px] flex z-50">
+  <div class="h-full w-1/3 bg-[#FF9933]"></div>
+  <div class="h-full w-1/3 bg-[#FFFFFF]"></div>
+  <div class="h-full w-1/3 bg-[#138808]"></div>
+</div>
+
+<!-- Header -->
+<header class="fixed top-[3px] left-0 w-full z-40 bg-[#032848] shadow-lg border-b border-[#004079]/50">
+  <div class="h-16 w-full max-w-7xl mx-auto px-6 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-[#004079] border border-[#e87312]/60 flex items-center justify-center relative shadow-sm">
+          <span class="w-2 h-2 rotate-45 bg-[#e87312] absolute"></span>
+          <span class="text-white font-bold text-xs relative z-10">A</span>
+        </div>
+        <span class="font-display text-sm text-white font-bold tracking-wider">ASTROLAB</span>
+      </div>
+    </div>
+    <nav class="hidden md:flex items-center gap-8">
+      <a class="text-[#e87312] font-mono text-[10px] font-bold uppercase tracking-widest" href="/dashboard/home.html">Home</a>
+      <a class="text-white/80 hover:text-[#e87312] font-mono text-[10px] font-bold uppercase tracking-widest transition-colors" href="/dashboard/about.html">About Us</a>
+    </nav>
+    <a class="bg-[#e87312] hover:bg-[#d96509] text-white font-mono text-[10px] font-bold uppercase px-5 py-2 rounded-full transition-colors tracking-wider" href="/dashboard/login.html">Operator Login</a>
+  </div>
+</header>
+
+<main class="w-full pt-[19px]">
+
+<!-- Hero Section with Earth Background -->
+<section class="relative w-full min-h-[92vh] overflow-hidden bg-[#032848] flex items-center justify-center">
+  <!-- Earth Background Image -->
+  <div class="absolute inset-0 z-0">
+    <img alt="Earth from space" class="w-full h-full object-cover object-center" src="/dashboard/earth_bg.jpg"/>
+    <div class="absolute inset-0 bg-gradient-to-b from-[#032848]/70 via-[#032848]/40 to-[#f5fafd]"></div>
+  </div>
+
+  <!-- Hero Content -->
+  <div class="relative z-10 max-w-4xl mx-auto px-6 text-center flex flex-col items-center py-24">
+    <h1 class="font-display text-5xl md:text-7xl text-white font-bold tracking-wide mb-6 drop-shadow-lg">
+      ASTROLAB
+    </h1>
+    <p class="font-sans text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-10 leading-relaxed">
+      AI-Driven Anomaly Detection for ISRO Component Burn-In &amp; Screening. Ensuring zero-defect space-grade electronics through predictive ML and real-time drift analysis.
+    </p>
+    <div class="flex flex-col sm:flex-row items-center gap-4">
+      <a class="bg-[#e87312] text-white font-mono text-xs uppercase px-8 py-3.5 rounded-full hover:bg-[#d96509] transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-bold tracking-wider" href="/dashboard/login.html">
+        <span>Start Analyzing</span>
+        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+      </a>
+    </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Feature Cards Section -->
+<section class="w-full max-w-7xl mx-auto px-6 py-16 relative -mt-16 z-20">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- Card 1: Module A -->
+    <div class="bg-white border border-[#164090]/15 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-[#e87312]/40 transition-all group">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-[#032848] flex items-center justify-center">
+          <span class="material-symbols-outlined text-[#e87312]">radar</span>
+        </div>
+        <h3 class="font-display text-xl text-[#032848] font-bold">Module A — Anomaly Detection</h3>
+      </div>
+      <p class="text-sm text-[#384760] leading-relaxed mb-5">
+        Per-parameter Z-score &amp; directional IQR analysis with cross-parameter Isolation Forest. Catches lot-relative outliers that static limits miss.
+      </p>
+      <a class="font-mono text-[10px] text-[#e87312] hover:text-[#d96509] uppercase font-bold flex items-center gap-1 tracking-wider" href="/dashboard/">
+        <span>View Results</span>
+        <span class="material-symbols-outlined text-[14px] group-hover:translate-x-1 transition-transform">chevron_right</span>
+      </a>
+    </div>
+
+    <!-- Card 2: Module B -->
+    <div class="bg-white border border-[#164090]/15 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-[#e87312]/40 transition-all group">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-[#032848] flex items-center justify-center">
+          <span class="material-symbols-outlined text-[#e87312]">timeline</span>
+        </div>
+        <h3 class="font-display text-xl text-[#032848] font-bold">Module B — Drift Prediction</h3>
+      </div>
+      <p class="text-sm text-[#384760] leading-relaxed mb-5">
+        XGBoost time-series predictor forecasts 168h endpoint from early 0h/24h readings. Safety slope calibrated at the 99.8th percentile.
+      </p>
+      <a class="font-mono text-[10px] text-[#e87312] hover:text-[#d96509] uppercase font-bold flex items-center gap-1 tracking-wider" href="/dashboard/">
+        <span>Predict Now</span>
+        <span class="material-symbols-outlined text-[14px] group-hover:translate-x-1 transition-transform">chevron_right</span>
+      </a>
+    </div>
+
+    <!-- Card 3: Explainability -->
+    <div class="bg-white border border-[#164090]/15 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-[#e87312]/40 transition-all group">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-[#032848] flex items-center justify-center">
+          <span class="material-symbols-outlined text-[#e87312]">psychology</span>
+        </div>
+        <h3 class="font-display text-xl text-[#032848] font-bold">SHAP Explainability</h3>
+      </div>
+      <p class="text-sm text-[#384760] leading-relaxed mb-5">
+        Every flag comes with a plain-language, SHAP-backed explanation naming which parameter drove the decision and by how much.
+      </p>
+      <a class="font-mono text-[10px] text-[#e87312] hover:text-[#d96509] uppercase font-bold flex items-center gap-1 tracking-wider" href="/dashboard/">
+        <span>Explore</span>
+        <span class="material-symbols-outlined text-[14px] group-hover:translate-x-1 transition-transform">chevron_right</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Bottom CTA -->
+  <div class="mt-12 bg-[#032848] rounded-xl p-8 flex flex-col lg:flex-row items-center justify-between gap-6">
+    <div class="flex items-center gap-4">
+      <span class="material-symbols-outlined text-[#e87312] text-3xl">verified_user</span>
+      <div>
+        <h4 class="font-display text-xl text-white font-bold">SIH 2026 — Problem Statement 26170</h4>
+        <p class="text-sm text-white/70">Team CodeWalkers · ISRO, Dept. of Space · Multi-parameter burn-in screening system</p>
+      </div>
+    </div>
+    <a class="font-mono text-[10px] uppercase bg-[#e87312] hover:bg-[#d96509] text-white px-6 py-3 rounded-lg font-bold tracking-wider transition-colors shrink-0" href="/dashboard/login.html">
+      Operator Sign In →
+    </a>
+  </div>
+</section>
+
+</main>
+
+<!-- Footer -->
+<footer class="w-full bg-[#032848] border-t border-[#004079]">
+  <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+    <span class="font-mono text-[10px] text-white/50 uppercase tracking-wider">© 2026 ASTROLAB · ISRO Dept. of Space</span>
+    <div class="flex items-center gap-6">
+      <a class="font-mono text-[10px] text-white/50 hover:text-[#e87312] transition-colors uppercase tracking-wider" href="/dashboard/about.html">About Us</a>
+      <a class="font-mono text-[10px] text-white/50 hover:text-[#e87312] transition-colors uppercase tracking-wider" href="/dashboard/login.html">Login</a>
+    </div>
+  </div>
+</footer>
+
+</body></html>

@@ -10,8 +10,77 @@ Uses SHAP for each parameter's tree-based drift model, and lot-relative
 deviation summaries for the anomaly detector.
 """
 
+import sys
+import types
 import numpy as np
 import pandas as pd
+
+# --- Numba compatibility shim ---
+# On some Windows systems, Application Control policies block numba's
+# native _nrt_python DLL.  SHAP only needs numba for optional JIT
+# acceleration of clustering utilities; TreeExplainer works perfectly
+# without it.  We pre-seed sys.modules with a lightweight stub so that
+# `from numba import njit` succeeds as a no-op decorator, avoiding the
+# blocked DLL import entirely.
+def _install_numba_stub():
+    """Install a minimal numba stub if the real one can't load."""
+    try:
+        import numba  # noqa: F401 — probe the real package
+        return  # real numba works, nothing to do
+    except (ImportError, OSError):
+        pass  # DLL blocked or missing → install stub
+
+    def _passthrough_decorator(*args, **kwargs):
+        """No-op replacement for @njit / @jit."""
+        if args and callable(args[0]):
+            return args[0]
+        def wrapper(fn):
+            return fn
+        return wrapper
+
+    class _StubModule(types.ModuleType):
+        """A module that auto-creates child sub-modules on attribute access."""
+        def __getattr__(self, name):
+            # Return common numba symbols as no-ops
+            if name in ("njit", "jit", "cfunc", "vectorize", "guvectorize",
+                         "stencil", "generated_jit"):
+                return _passthrough_decorator
+            if name == "prange":
+                return range
+            if name == "typed":
+                return _make_typed_stub()
+            # Auto-create sub-modules for anything else
+            fqn = f"{self.__name__}.{name}"
+            if fqn not in sys.modules:
+                child = _StubModule(fqn)
+                sys.modules[fqn] = child
+            return sys.modules[fqn]
+
+    def _make_typed_stub():
+        mod = _StubModule("numba.typed")
+        mod.List = list
+        mod.Dict = dict
+        sys.modules["numba.typed"] = mod
+        return mod
+
+    stub = _StubModule("numba")
+    stub.__version__ = "0.0.0-stub"
+    stub.__path__ = []  # make it look like a package
+    sys.modules["numba"] = stub
+
+    # Pre-seed commonly accessed sub-modules
+    for sub in ("numba.core", "numba.core.types", "numba.typed",
+                "numba.np", "numba.np.ufunc", "numba.extending"):
+        if sub not in sys.modules:
+            child = _StubModule(sub)
+            child.__path__ = []
+            sys.modules[sub] = child
+
+    # Ensure numba.typed has List/Dict
+    _make_typed_stub()
+
+_install_numba_stub()
+
 import shap
 
 from data.generate_data import value_col, detect_parameters, PARAMETERS

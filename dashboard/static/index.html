@@ -9,6 +9,23 @@
 <script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"inverse-on-surface":"#eaf1ff","on-error-container":"#93000a","error":"#ba1a1a","tertiary":"#002740","on-primary-fixed-variant":"#1d496f","secondary-container":"#fc8121","primary-container":"#0a3d62","surface-tint":"#386188","background":"#f8f9ff","primary-fixed":"#cfe5ff","secondary-fixed-dim":"#ffb68a","secondary":"#984700","inverse-surface":"#213145","on-error":"#ffffff","outline":"#72777f","on-primary-fixed":"#001d34","on-tertiary-container":"#4dacf1","tertiary-fixed":"#cce5ff","surface-variant":"#d3e4fe","surface-container-lowest":"#ffffff","on-tertiary-fixed-variant":"#004b73","on-surface-variant":"#42474e","tertiary-container":"#003e61","primary":"#002743","surface-container":"#e5eeff","tertiary-fixed-dim":"#93ccff","on-tertiary-fixed":"#001d31","on-surface":"#0b1c30","surface-dim":"#cbdbf5","on-tertiary":"#ffffff","secondary-fixed":"#ffdbc8","inverse-primary":"#a2caf7","surface":"#f8f9ff","on-secondary-fixed":"#321300","on-background":"#0b1c30","on-primary":"#ffffff","on-secondary-container":"#5f2a00","surface-container-high":"#dce9ff","on-secondary":"#ffffff","on-secondary-fixed-variant":"#743500","outline-variant":"#c2c7cf","on-primary-container":"#80a8d3","primary-fixed-dim":"#a2caf7","surface-bright":"#f8f9ff","surface-container-highest":"#d3e4fe","surface-container-low":"#eff4ff","error-container":"#ffdad6"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-xl":"2rem","space-xs":"0.5rem","space-md":"1rem","space-2xl":"3rem","gutter-desktop":"1.5rem","space-3xl":"4rem","container-max":"1280px","gutter-mobile":"1rem","space-lg":"1.5rem","space-sm":"0.75rem","space-2xs":"0.25rem"},"fontFamily":{"display":["spaceGrotesk"],"body-lg":["inter"],"body-sm":["inter"],"headline-md":["spaceGrotesk"],"headline-lg":["spaceGrotesk"],"title":["inter"],"headline-sm":["spaceGrotesk"],"body-md":["inter"],"label-md":["spaceGrotesk"],"label-lg":["spaceGrotesk"],"telemetry-mono":["spaceGrotesk"],"metric-display":["spaceGrotesk"],"headline-lg-mobile":["spaceGrotesk"]},"fontSize":{"display":["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"700"}],"body-lg":["16px",{"lineHeight":"26px","fontWeight":"400"}],"body-sm":["12px",{"lineHeight":"18px","fontWeight":"400"}],"headline-md":["24px",{"lineHeight":"32px","fontWeight":"600"}],"headline-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"700"}],"title":["18px",{"lineHeight":"26px","fontWeight":"600"}],"headline-sm":["20px",{"lineHeight":"28px","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"22px","fontWeight":"400"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"600"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.02em","fontWeight":"600"}],"telemetry-mono":["13px",{"lineHeight":"18px","letterSpacing":"0.04em","fontWeight":"500"}],"metric-display":["36px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"700"}],"headline-lg-mobile":["26px",{"lineHeight":"32px","fontWeight":"700"}]}}}}</script>
 </head>
 <body class="bg-surface font-body-md text-on-surface">
+<script>
+// ===== AUTH GUARD: Redirect to login if no valid session =====
+(function() {
+  try {
+    const raw = sessionStorage.getItem('astrolab_session');
+    if (!raw) { window.location.replace('/dashboard/login.html'); return; }
+    const session = JSON.parse(raw);
+    if (!session.token || !session.expiresAt || Date.now() > session.expiresAt) {
+      sessionStorage.removeItem('astrolab_session');
+      window.location.replace('/dashboard/login.html');
+    }
+  } catch(e) {
+    sessionStorage.removeItem('astrolab_session');
+    window.location.replace('/dashboard/login.html');
+  }
+})();
+</script>
 
 <!-- ==================== HEADER ==================== -->
 <header class="fixed top-0 left-0 right-0 z-50 bg-primary-container shadow-[0_1px_8px_rgba(10,61,98,0.12)]">
@@ -34,6 +51,12 @@
 <span class="material-symbols-outlined text-[18px]">download</span><span>Export</span>
 </button>
 <div class="flex items-center gap-space-sm pl-space-md border-l border-on-primary-container/20">
+<a href="/dashboard/home.html" class="flex items-center gap-1 text-on-primary-container hover:text-white transition-colors font-label-md text-label-md uppercase mr-1" title="ASTROLAB Home">
+<span class="material-symbols-outlined text-[20px]">public</span>
+</a>
+<a href="#" onclick="sessionStorage.removeItem('astrolab_session');window.location.href='/dashboard/login.html';return false;" class="flex items-center gap-1 text-on-primary-container hover:text-secondary-container transition-colors font-label-md text-label-md uppercase mr-2" title="Sign Out">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+</a>
 <div class="text-right hidden sm:block">
 <span class="block font-telemetry-mono text-telemetry-mono text-on-primary">QA-ENGR-8491</span>
 <span class="block font-label-md text-label-md text-on-primary-container">Level 4 Inspector</span>
@@ -69,11 +92,25 @@
 <span class="font-label-lg text-label-lg">Live Predictor</span>
 </a>
 </nav>
-<div class="px-space-md pt-space-md border-t border-surface-container-high">
+<div class="px-space-md py-space-xs flex flex-col gap-space-2xs border-t border-surface-container-high">
+<span class="font-label-md text-label-md uppercase text-outline tracking-wider px-space-xs mb-1">ASTROLAB System</span>
+<a class="flex items-center px-space-md py-space-xs rounded-lg text-outline hover:text-primary transition-all text-label-md font-label-md" href="/dashboard/home.html">
+<span class="material-symbols-outlined mr-space-sm text-[18px]">public</span>
+<span>Planetary Home</span>
+</a>
+<a class="flex items-center px-space-md py-space-xs rounded-lg text-outline hover:text-primary transition-all text-label-md font-label-md" href="/dashboard/about.html">
+<span class="material-symbols-outlined mr-space-sm text-[18px]">info</span>
+<span>About ASTROLAB</span>
+</a>
+<a class="flex items-center px-space-md py-space-xs rounded-lg text-outline hover:text-primary transition-all text-label-md font-label-md" href="/dashboard/login.html">
+<span class="material-symbols-outlined mr-space-sm text-[18px]">lock_reset</span>
+<span>Switch Operator</span>
+</a>
+</div>
+<div class="px-space-md pt-space-xs border-t border-surface-container-high">
 <div class="p-space-sm rounded-lg bg-surface-container-low flex flex-col gap-space-2xs">
 <span class="font-label-md text-label-md text-outline uppercase">Chamber Facility</span>
 <span class="font-telemetry-mono text-telemetry-mono text-primary font-bold">ISITE-CH-04</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">Atm: 125°C // Dynamic Bias</span>
 </div>
 </div>
 </aside>
@@ -114,6 +151,7 @@ let state = {
   lotComponents: null,
   flaggedComponents: null,
   selectedComponent: null,
+  drillLot: null,
   componentDetail: null,
   predictorResult: null,
   lotPage: 1,
@@ -264,13 +302,7 @@ async function renderOverview() {
           <span class="px-space-xs py-space-2xs rounded-full bg-secondary-fixed text-on-secondary-fixed font-telemetry-mono text-telemetry-mono uppercase">Batch Live</span>
           <span class="px-space-xs py-space-2xs rounded-full bg-surface-container text-on-surface-variant font-telemetry-mono text-telemetry-mono">ISITE Chamber #04</span>
         </div>
-        <div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm">
-          <span class="material-symbols-outlined text-[16px] text-secondary">tune</span>
-          <span>Standard Cycle:</span>
-          <span class="font-telemetry-mono text-telemetry-mono font-bold text-primary">MIL-STD-883K Class-S</span>
-          <span class="text-outline-variant">•</span>
-          <span class="font-telemetry-mono text-telemetry-mono text-primary">168h Stress @ 125°C Dynamic Bias</span>
-        </div>
+
       </div>
       <div class="flex items-center gap-space-sm self-start lg:self-center">
         <button class="flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors shadow-sm">
@@ -284,11 +316,11 @@ async function renderOverview() {
 
     <!-- KPI Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-space-md">
-      ${kpiCard('Total Tested', fmtInt(o.total_tested), 'memory', '#fc8121', `+${fmtInt(o.total_tested)} from all lots`, 'trending_up', '#fc8121')}
-      ${kpiCard('Flagged Outliers', fmtInt(o.flagged_outliers), 'warning', '#ba1a1a', `${o.drift_rate_pct}% drift rate`, 'trending_up', '#ba1a1a', true, 'Quarantine')}
-      ${kpiCard('Recall Rate', pct(o.recall_rate), 'verified', '#0a3d62', 'Tgt 99.0%', null, null, false, 'Flight Class-S')}
-      ${kpiCard('False Negatives', fmtInt(o.false_negatives), 'check_circle', '#386188', `< 0.005% (In Spec)`, null, '#fc8121')}
-      ${kpiCard('False Positives', fmtInt(o.false_positives), 'fact_check', '#984700', `${fmt(o.false_positives / o.total_tested * 100, 2)}%`, null, '#984700', false, 'Re-screen Queue')}
+      ${kpiCard('Total Tested', fmtInt(o.total_tested), 'memory', '#fc8121', '', null, '#fc8121')}
+      ${kpiCard('Flagged Outliers', fmtInt(o.flagged_outliers), 'warning', '#ba1a1a', '', null, '#ba1a1a', true)}
+      ${kpiCard('Recall Rate', pct(o.recall_rate), 'verified', '#0a3d62', '', null, null)}
+      ${kpiCard('False Negatives', fmtInt(o.false_negatives), 'check_circle', '#386188', '', null, '#fc8121')}
+      ${kpiCard('False Positives', fmtInt(o.false_positives), 'fact_check', '#984700', '', null, '#984700')}
     </div>
 
     <!-- Yield + Mission Row -->
@@ -298,7 +330,7 @@ async function renderOverview() {
         <div class="flex items-center justify-between pb-space-sm">
           <div class="flex flex-col">
             <span class="font-title text-title text-primary">Yield Breakdown & Qualification</span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant">Cumulative across current 168h thermal run</span>
+
           </div>
           <span class="material-symbols-outlined text-outline">pie_chart</span>
         </div>
@@ -316,12 +348,12 @@ async function renderOverview() {
                 <span class="w-3 h-3 rounded-full bg-primary-container"></span>
                 <div class="flex flex-col">
                   <span class="font-label-lg text-label-lg text-primary font-bold">Pass / Space-Ready</span>
-                  <span class="font-body-sm text-body-sm text-on-surface-variant">Class-S Flight Grade</span>
+
                 </div>
               </div>
               <div class="text-right">
                 <span class="block font-telemetry-mono text-telemetry-mono font-bold text-primary">${fmtInt(o.passed)}</span>
-                <span class="block font-label-md text-[11px] text-outline">${o.yield_pct}%</span>
+
               </div>
             </div>
             <div class="p-space-sm rounded-lg bg-surface-container-low flex items-center justify-between gap-space-md min-w-[190px]">
@@ -329,12 +361,12 @@ async function renderOverview() {
                 <span class="w-3 h-3 rounded-full bg-secondary-container"></span>
                 <div class="flex flex-col">
                   <span class="font-label-lg text-label-lg text-secondary font-bold">Flagged Drift</span>
-                  <span class="font-body-sm text-body-sm text-on-surface-variant">Quarantine Depot</span>
+
                 </div>
               </div>
               <div class="text-right">
                 <span class="block font-telemetry-mono text-telemetry-mono font-bold text-error">${fmtInt(o.flagged_outliers)}</span>
-                <span class="block font-label-md text-[11px] text-outline">${o.drift_rate_pct}%</span>
+
               </div>
             </div>
             <!-- Workflow Image Pop-out Button -->
@@ -344,10 +376,7 @@ async function renderOverview() {
             </button>
           </div>
         </div>
-        <div class="flex items-center justify-between pt-space-sm bg-surface-container-low px-space-md py-space-xs rounded-lg">
-          <span class="font-body-sm text-body-sm text-on-surface-variant">Verification Threshold Margin:</span>
-          <span class="font-telemetry-mono text-telemetry-mono text-primary font-bold">+4.12σ Delta IDDQ</span>
-        </div>
+
       </div>
 
       <!-- Mission Allocation -->
@@ -355,7 +384,7 @@ async function renderOverview() {
         <div class="flex items-center justify-between">
           <div class="flex flex-col">
             <span class="font-title text-title text-primary">Active Mission Allocation & Traceability</span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant">Downstream subsystem assignment for screened batch</span>
+
           </div>
           <span class="px-space-sm py-space-2xs rounded-full bg-primary text-on-primary font-telemetry-mono text-telemetry-mono">FLIGHT ALLOCATED</span>
         </div>
@@ -364,7 +393,7 @@ async function renderOverview() {
             <div class="relative z-10 flex flex-col">
               <span class="font-label-md text-label-md uppercase text-secondary font-bold">Payload Target</span>
               <span class="font-headline-sm text-headline-sm text-primary tracking-tight mt-space-2xs">Gaganyaan-03</span>
-              <span class="font-body-sm text-body-sm text-on-surface-variant mt-1">Crew Module Avionics (OBC-Quad-V)</span>
+
             </div>
             <div class="relative z-10 flex items-center gap-space-2xs">
               <span class="material-symbols-outlined text-[16px] text-secondary">verified_user</span>
@@ -375,7 +404,7 @@ async function renderOverview() {
             <div class="flex flex-col">
               <span class="font-label-md text-label-md uppercase text-outline">Flight Volume</span>
               <span class="font-metric-display text-headline-lg text-primary font-bold mt-space-2xs">${fmtInt(o.passed)}</span>
-              <span class="font-body-sm text-body-sm text-on-surface-variant">Qualified Components Allocated</span>
+
             </div>
             <div class="flex items-center justify-between">
               <span class="font-label-md text-label-md text-outline">Packaging:</span>
@@ -389,7 +418,7 @@ async function renderOverview() {
                 <span class="font-metric-display text-headline-lg text-secondary font-bold">>100</span>
                 <span class="font-label-lg text-label-lg text-primary">krad(Si)</span>
               </div>
-              <span class="font-body-sm text-body-sm text-on-surface-variant">TID & SEL Immune (>75 MeV)</span>
+
             </div>
             <div class="flex items-center gap-space-2xs">
               <span class="w-2 h-2 rounded-full bg-secondary"></span>
@@ -509,7 +538,7 @@ async function renderLotExplorer() {
             <span class="material-symbols-outlined text-primary text-[20px]">scatter_plot</span>
             <h2 class="font-headline-sm text-headline-sm text-primary">168h Post-Screening ${scatterData.display_name} Scatter Distribution (${scatterData.unit})</h2>
           </div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-space-2xs">Static HTOL burn-in test sequence chamber readings. Nominal limits evaluated against MIL-STD-883K threshold criteria.</p>
+
         </div>
         <div class="flex flex-wrap items-center gap-space-md bg-surface-container-low px-space-md py-space-xs rounded-lg">
           <div class="flex items-center gap-space-xs"><span class="w-3 h-3 rounded-full bg-tertiary-container"></span><span class="font-label-md text-label-md text-on-surface-variant">Normal</span></div>
@@ -579,6 +608,26 @@ async function renderLotExplorer() {
 }
 
 // ==================== 3. COMPONENT DRILL-DOWN ====================
+async function onDrillLotChange(newLot) {
+  state.drillLot = newLot;
+  if (newLot === 'ALL') {
+    if (state.flaggedComponents && state.flaggedComponents.components.length > 0) {
+      state.selectedComponent = state.flaggedComponents.components[0].component_id;
+    }
+  } else {
+    try {
+      const lotRes = await api(`/api/lot/${newLot}/components?page_size=100`);
+      if (lotRes && lotRes.components && lotRes.components.length > 0) {
+        const flaggedInLot = lotRes.components.find(c => c.flagged);
+        state.selectedComponent = flaggedInLot ? flaggedInLot.component_id : lotRes.components[0].component_id;
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  }
+  await renderComponentDrilldown();
+}
+
 async function renderComponentDrilldown() {
   if (!state.lots) state.lots = await api('/api/lots');
   if (!state.flaggedComponents) state.flaggedComponents = await api('/api/flagged?page_size=100');
@@ -597,6 +646,40 @@ async function renderComponentDrilldown() {
     return;
   }
 
+  if (!state.drillLot) {
+    state.drillLot = detail.lot_id || 'ALL';
+  }
+
+  // Load component options for the current lot selection
+  let componentOptions = [];
+  if (state.drillLot === 'ALL') {
+    componentOptions = flagged.map(f => ({
+      id: f.component_id,
+      label: `${f.component_id} [${f.lot_id}] (Score: ${f.anomaly_score})`
+    }));
+  } else {
+    try {
+      const lotRes = await api(`/api/lot/${state.drillLot}/components?page_size=100`);
+      if (lotRes && lotRes.components) {
+        componentOptions = lotRes.components.map(c => ({
+          id: c.component_id,
+          label: `${c.component_id} ${c.flagged ? '⚠️ (Flagged · Score: ' + c.anomaly_score + ')' : '(Normal)'}`
+        }));
+      }
+    } catch(e) {
+      componentOptions = flagged.filter(f => f.lot_id === state.drillLot).map(f => ({
+        id: f.component_id,
+        label: `${f.component_id} (Score: ${f.anomaly_score})`
+      }));
+    }
+  }
+
+  // Ensure current selectedComponent exists in componentOptions
+  if (componentOptions.length > 0 && !componentOptions.some(o => o.id === state.selectedComponent)) {
+    state.selectedComponent = componentOptions[0].id;
+    detail = await api(`/api/component/${state.selectedComponent}`);
+  }
+
   const firstParam = Object.keys(detail.parameters)[0] || 'leakage_ua';
   const pData = detail.parameters[firstParam];
   const readings = pData?.readings || {};
@@ -606,23 +689,40 @@ async function renderComponentDrilldown() {
   <div class="fade-in flex flex-col w-full gap-space-lg">
     <!-- Component Context Bar -->
     <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-wrap items-center justify-between gap-space-md">
-      <div class="flex items-center gap-space-md min-w-0">
+      <div class="flex items-center gap-space-md min-w-0 flex-wrap">
         <div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center shrink-0">
           <span class="material-symbols-outlined text-primary text-[24px]">memory</span>
         </div>
-        <div class="flex flex-col min-w-0">
-          <div class="flex items-center gap-space-xs flex-wrap">
-            <select id="componentSelector" onchange="state.selectedComponent=this.value;renderComponentDrilldown()" class="font-telemetry-mono text-telemetry-mono font-bold text-primary bg-transparent border-b-2 border-secondary focus:outline-none cursor-pointer pr-6">
-              ${flagged.map(f => `<option value="${f.component_id}" ${f.component_id === state.selectedComponent ? 'selected' : ''}>${f.component_id}</option>`).join('')}
-            </select>
-            <span class="px-space-xs py-space-2xs rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md">Lot: ${detail.lot_id}</span>
-          </div>
-          <div class="flex items-center gap-space-sm font-body-sm text-body-sm text-on-surface-variant">
-            <span>Triggered: ${detail.triggered_parameters || 'N/A'}</span>
-            <span>•</span>
-            <span>Module A: ${detail.flag_module_a ? '✓' : '—'} | Module B: ${detail.flag_module_b ? '✓' : '—'}</span>
-          </div>
+        
+        <!-- Lot Selector & Navigation (Changeable & Accessible) -->
+        <div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1.5 rounded-lg border border-outline-variant/40">
+          <span class="material-symbols-outlined text-secondary text-[18px]">inventory_2</span>
+          <span class="font-label-md text-label-md text-outline uppercase font-semibold">Lot:</span>
+          <select id="drillLotSelector" onchange="onDrillLotChange(this.value)" class="font-telemetry-mono text-telemetry-mono font-bold text-primary bg-transparent focus:outline-none cursor-pointer pr-2">
+            ${state.lots.map(l => `<option value="${l.lot_id}" ${state.drillLot === l.lot_id ? 'selected' : ''}>${l.lot_id} (${l.n_flagged} flagged)</option>`).join('')}
+            <option value="ALL" ${state.drillLot === 'ALL' ? 'selected' : ''}>All Lots (All Flagged)</option>
+          </select>
+          <button onclick="state.selectedLot='${detail.lot_id}';navigate('lot-explorer')" title="Open ${detail.lot_id} in Lot Explorer" class="flex items-center gap-1 text-secondary hover:text-on-secondary-container transition-colors pl-2 border-l border-outline-variant/50 font-label-md text-label-md">
+            <span>View Lot</span>
+            <span class="material-symbols-outlined text-[15px]">open_in_new</span>
+          </button>
         </div>
+
+        <!-- Component Selector -->
+        <div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1.5 rounded-lg border border-outline-variant/40">
+          <span class="font-label-md text-label-md text-outline uppercase font-semibold">Part:</span>
+          <select id="componentSelector" onchange="state.selectedComponent=this.value;renderComponentDrilldown()" class="font-telemetry-mono text-telemetry-mono font-bold text-primary bg-transparent focus:outline-none cursor-pointer pr-2">
+            ${componentOptions.map(opt => `<option value="${opt.id}" ${opt.id === state.selectedComponent ? 'selected' : ''}>${opt.label}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <!-- Part Status Badge -->
+      <div class="flex items-center gap-space-sm">
+        <span class="px-space-sm py-1 rounded-full ${detail.flagged ? 'bg-error-container text-on-error-container' : 'bg-surface-container text-primary'} font-label-md text-label-md font-bold flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px]">${detail.flagged ? 'flag' : 'check_circle'}</span>
+          <span>${detail.flagged ? 'Part Flagged' : 'Part Nominal'}</span>
+        </span>
       </div>
     </div>
 
@@ -670,7 +770,10 @@ async function renderComponentDrilldown() {
           <div class="flex flex-col gap-space-sm">
             <div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-low">
               <span class="font-body-md text-body-md text-on-surface-variant">Lot Sequence ID</span>
-              <span class="font-telemetry-mono text-telemetry-mono font-bold text-on-surface">${detail.lot_id}</span>
+              <button onclick="state.selectedLot='${detail.lot_id}';navigate('lot-explorer')" title="Open in Lot Explorer" class="font-telemetry-mono text-telemetry-mono font-bold text-secondary hover:underline flex items-center gap-1">
+                <span>${detail.lot_id}</span>
+                <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+              </button>
             </div>
             <div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container-low">
               <span class="font-body-md text-body-md text-on-surface-variant">0h Pre-Burn Baseline</span>
@@ -973,10 +1076,10 @@ function kpiCard(label, value, icon, accentColor, subText, trendIcon, trendColor
     <div class="my-space-sm">
       <span class="font-metric-display text-metric-display tracking-tight" style="color:${isError ? '#ba1a1a' : accentColor}">${value}</span>
     </div>
-    <div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm">
+    ${subText ? `<div class="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm">
       <span class="font-telemetry-mono text-telemetry-mono" style="color:${trendColor || accentColor}">${subText}</span>
       ${badge ? `<span class="px-space-2xs py-0.5 rounded bg-surface-container-high font-label-md text-[10px] uppercase">${badge}</span>` : ''}
-    </div>
+    </div>` : ''}
   </div>`;
 }
 

@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -121,6 +121,24 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "ok", "components_loaded": len(_state.get("wide_df", []))}
+
+
+@app.get("/login")
+def login_route():
+    """Redirect to the ASTROLAB Operator Login screen."""
+    return RedirectResponse(url="/dashboard/login.html")
+
+
+@app.get("/home")
+def home_route():
+    """Redirect to the ASTROLAB Home screen."""
+    return RedirectResponse(url="/dashboard/home.html")
+
+
+@app.get("/about")
+def about_route():
+    """Redirect to the ASTROLAB About Us screen."""
+    return RedirectResponse(url="/dashboard/about.html")
 
 
 # ========================== Dashboard API ==========================

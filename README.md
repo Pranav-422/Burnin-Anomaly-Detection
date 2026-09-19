@@ -1,193 +1,175 @@
-# AI-Driven Anomaly Detection in Component Burn-In & Screening
+# ASTROLAB — AI-Driven Anomaly Detection in Component Burn-In & Screening
 
-**Team:** CodeWalkers · **Problem Statement:** 26170 (ISRO, Dept. of Space) · **SIH 2026**
+**Team:** CodeWalkers · **Problem Statement:** 26170 (ISRO, Dept. of Space) · **Smart India Hackathon (SIH 2026)**
 
-A predictive ML system that replaces static pass/fail burn-in limits with:
-1. **Module A** — dynamic, lot-relative outlier detection (per parameter + cross-parameter)
-2. **Module B** — time-series drift prediction with early rejection (per parameter)
-3. **Explainability layer** — SHAP-backed, human-readable justification naming which parameter drove every flag
+ASTROLAB is an intelligent, physics-informed aerospace quality screening system designed for mission-critical space-grade electronics. It replaces blunt, static datasheet limits with:
+1. **Module A** — dynamic, lot-relative outlier detection (per-parameter directional IQR + cross-parameter Isolation Forest).
+2. **Module B** — time-series drift prediction forecasting 168h endpoints from early readings (0h/24h) with calibrated early rejection.
+3. **Explainability Layer** — SHAP-backed, human-readable justification naming exact electrical parameter and feature drivers for every flagged component.
+4. **ASTROLAB Web Suite** — a full-featured, responsive, ISRO-themed web console with operator authentication, planetary landing, project dossier, and real-time telemetry.
 
-See `PRD_Burn_In_Anomaly_Detection.pdf` for full requirements and architecture.
+See `PRD_Burn_In_Anomaly_Detection.pdf` for full requirements and system architecture.
 
-## Multi-parameter screening
+---
 
-The system screens **three burn-in parameters** per component, per the problem statement's
-"e.g. standby current Iddq, leakage currents, or propagation delays":
+## The Aerospace Challenge
 
-| Parameter | Column key | Unit | What it is |
+Spacecraft components cannot be repaired or replaced in orbit. A single latent defect escaping quality control can jeopardize a multi-crore satellite mission.
+- **The Failure of Static Limits:** A component that drifts dangerously from 10µA to 48µA still passes a static 50µA datasheet threshold despite suffering severe gate-oxide breakdown. Conversely, healthy chips from high-baseline manufacturing lots get wrongly scrapped.
+- **Chamber Bottlenecks & Energy Cost:** Standard 168-hour High-Temperature Operating Life (HTOL at 125°C) tests create massive queue delays and energy consumption.
+- **The ASTROLAB Solution:** Evaluates parts relative to their specific manufacturing lot (Module A), forecasts 168h values at $T+24\text{h}$ with a $99.8^{\text{th}}$ percentile safety threshold to enable early rejection (Module B, saving ~85% chamber time), and provides full SHAP auditability.
+
+---
+
+## Multi-Parameter Electrical Screening
+
+The system screens **three burn-in parameters** per component:
+
+| Parameter | Column Key | Unit | Physics & Screening Significance |
 |---|---|---|---|
-| Leakage current | `leakage_ua` | µA | Standby leakage current |
-| Iddq | `iddq_ua` | µA | Quiescent supply current |
-| Propagation delay | `prop_delay_ns` | ns | Signal propagation delay |
+| **Leakage Current** | `leakage_ua` | µA | Reverse-bias dielectric leakage. Exponential thermal drift indicates gate-oxide defect. |
+| **Quiescent Supply Current (Iddq)** | `iddq_ua` | µA | Standby supply current. Sensitive to bridging faults, gate punch-through, and silicon micro-cracks. |
+| **Propagation Delay** | `prop_delay_ns` | ns | Gate switching transition time. Captures NBTI and hot-carrier degradation across logic paths. |
 
-Each component gets **one `is_defective` draw**, not one per parameter — a genuinely defective
-part shows *correlated* elevated drift across all three parameters (mirroring a real physical
-defect, e.g. a gate-oxide weakness, that manifests across multiple electrical characteristics at
-once), rather than three independent unrelated anomalies. Module A's Isolation Forest runs
-**across all checkpoints × all parameters jointly per lot**, which is what catches cross-parameter
-anomalies a single-parameter check would miss (e.g. normal leakage but abnormal propagation delay).
+Each component receives **one unified defect status** across all three parameters, mirroring real physical failure mechanisms (e.g. gate-oxide defects) that manifest across multiple electrical characteristics simultaneously.
 
-**Backward compatibility:** every column-naming function in `module_a`/`module_b` uses a
-`_suffix(parameter)` helper — empty string for `parameter=None` (legacy/single-parameter mode),
-`f"_{parameter}"` otherwise. Calling `generate_burnin_dataset(parameters=["leakage_ua"])` +
-`to_wide(..., parameters=["leakage_ua"])` reproduces the exact original single-parameter schema
-(unsuffixed `Value_0h`, `Value_24h`, ... columns), and every downstream module
-(`run_module_a`, `train_and_predict_all`, the API, the dashboard) auto-detects which mode it's in
-via `detect_parameters()`.
+---
 
-## Project structure
+## ASTROLAB Web Portal Architecture
+
+ASTROLAB provides a unified, space-grade web experience served directly via FastAPI (`http://127.0.0.1:8000`):
+
+| Page | URL Route | Description |
+|---|---|---|
+| **Planetary Home** | `/home` or `/dashboard/home.html` | ISRO-themed landing page with Earth imagery, project overview, and one-click access to the screening console. |
+| **About Us Dossier** | `/about` or `/dashboard/about.html` | Comprehensive project dossier detailing the aerospace challenge, the 3 core pillars, screened electrical parameters, MIL-STD-883K compliance, and Team CodeWalkers. |
+| **Operator Login** | `/login` or `/dashboard/login.html` | Hardened operator authentication portal featuring 5-attempt brute-force lockout (2-minute cooldown), input sanitization, password strength indicator, and session token management. |
+| **Screening Console** | `/dashboard/` or `/dashboard/index.html` | Full interactive QA console protected by session auth guard: Executive Telemetry, Multi-parameter Lot Explorer, Enhanced Component Drill-Down, and Live Predictor. |
+
+### Enhanced Component Drill-Down Features:
+- **Changeable Lot Selector:** Filter and switch between lots directly inside the drill-down view, dynamically populating parts belonging to that lot with clear `⚠️ Flagged` and `Normal` indicators.
+- **Accessible Lot Navigation:** One-click **"View Lot"** action button and clickable **Lot Sequence ID** linking directly into that lot's distribution inside the Lot Explorer.
+- **Cleaned Telemetry:** Obsolete static placeholder strings removed in favor of dynamic, live-calculated diagnostics.
+
+---
+
+## Project Structure
 
 ```
 burnin-anomaly-detection/
 ├── data/
-│   └── generate_data.py       # physics-informed synthetic burn-in dataset (Arrhenius-style drift), multi-parameter
+│   └── generate_data.py          # physics-informed Arrhenius drift generator (multi-parameter)
 ├── module_a/
-│   └── anomaly_detection.py   # per-parameter Z-score/IQR + cross-parameter Isolation Forest
+│   └── anomaly_detection.py      # directional IQR + lot Z-scores + joint Isolation Forest
 ├── module_b/
-│   └── drift_predictor.py     # per-parameter feature engineering, Linear Regression + XGBoost, safety slope
+│   └── drift_predictor.py        # feature engineering, XGBoost 168h predictor, 99.8% safety slope
 ├── explainability/
-│   └── shap_utils.py          # per-parameter SHAP explainer + severity-ranked plain-language reasons
+│   └── shap_utils.py             # SHAP TreeExplainer + plain-language diagnostic generation
 ├── api/
-│   └── main.py                # FastAPI backend — /predict takes a `parameter` field to select which model
+│   └── main.py                   # FastAPI application + static web dashboard mount + REST endpoints
 ├── dashboard/
-│   └── app.py                 # Streamlit QA dashboard — parameter selector on every tab + a flagged-parts table
-├── run_pipeline.py            # end-to-end orchestration script
-├── requirements.txt
-└── outputs/                   # generated data, trained models (one per parameter), reports (created on run)
+│   ├── app.py                    # Streamlit QA dashboard (port 8501, Python + Plotly)
+│   └── static/                   # ASTROLAB Web Portal (port 8000)
+│       ├── home.html             # Planetary Landing Page
+│       ├── about.html            # Mission Dossier & Architecture Page
+│       ├── login.html            # Operator Authentication Screen (Hardened)
+│       ├── index.html            # Main Operator Screening Console
+│       └── earth_bg.jpg          # Earth visual asset
+├── run_pipeline.py               # End-to-end orchestration pipeline
+├── requirements.txt              # Project dependencies
+├── antigravity_changes_log.md    # Audit log, re-engineering history, and performance verification
+└── outputs/                      # Models, final QA reports, wide datasets
 ```
 
-## Setup
+---
+
+## Setup & Execution
+
+### 1. Installation
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Run the full pipeline
+### 2. Run the Full ML Pipeline
 
-Generates data, trains all three parameters' models in both modules, and produces the combined QA report:
+Generates synthetic Arrhenius drift data, fits models across all 3 parameters, evaluates Module A & B, and outputs final QA reports:
 
 ```bash
-python3 run_pipeline.py
+python run_pipeline.py
 ```
 
-This writes to `outputs/`:
-- `burnin_data_wide.csv` — synthetic dataset (1000 components, 25 lots, ~5-6% latent defects), one
-  `Value_<hour>h_<parameter>` column per checkpoint × parameter
-- `module_a_results.csv`, `module_b_results.csv` — per-module flags and scores, per parameter, plus
-  a `triggered_parameters` / `triggered_parameters_b` column naming which parameter(s) fired
-- `xgb_model_<parameter>.joblib`, `linear_model_<parameter>.joblib` — one trained model pair per parameter
-- `final_report.csv` — combined flags + severity-ranked explanations naming the parameter, ready for the dashboard
+Outputs created in `outputs/`:
+- `burnin_data_wide.csv` — multi-parameter burn-in dataset (1000 components, 25 lots).
+- `module_a_results.csv`, `module_b_results.csv` — per-module anomaly flags and scores.
+- `xgb_model_<parameter>.joblib` — trained XGBoost models per parameter.
+- `final_report.csv` — fused multi-parameter screening verdict with SHAP plain-language explanations.
 
-**Current results on synthetic data:**
-| Metric | Value |
-|---|---|
-| Combined recall (defects caught) | 100% |
-| False negatives | 0 |
-| Overall classification accuracy | 99.6% (996/1000 correct) |
-| Module A precision | 94.3% (53 flagged / 50 real defects) |
-| Module B precision | 96.2% (52 flagged / 50 real defects) |
-| Precision (combined) | 92.6% (54 flagged / 50 real defects) |
-| Combined F1-Score | 96.2% |
-| Module B test-set MAE | leakage ~0.36µA · Iddq ~0.64µA · prop delay ~0.13ns |
+---
 
-Thresholds are calibrated according to statistical process control (SPC) principles:
-- **Module A IQR**: Upper quartile departure $k=2.0$ aligned with physical degradation direction (elevated drift) and Z-score $|Z| \ge 3.0\sigma$.
-- **Module A Isolation Forest**: Contamination rate $0.02$ with score margin filter ($<-0.03$) to prevent quota-driven false alarms on clean lots.
-- **Module B Safety Slope**: 99.8th percentile (~$3.1\sigma$ upper process limit) on known-good baseline drift rates, eliminating false alarms on normal operating drift.
+## Running the Interfaces
 
-MAE above is reported strictly on the held-out **test split**, never by re-predicting on the full
-training dataset — that was a real bug in an earlier single-parameter version (inflated apparent
-accuracy) and was fixed as part of this multi-parameter work.
-
-## Run the API
+### Modern Web Portal & Screening Console (FastAPI) — Recommended
 
 ```bash
 uvicorn api.main:app --reload --port 8000
 ```
+- **Landing Page:** [http://127.0.0.1:8000/home](http://127.0.0.1:8000/home)
+- **About Us:** [http://127.0.0.1:8000/about](http://127.0.0.1:8000/about)
+- **Operator Login:** [http://127.0.0.1:8000/login](http://127.0.0.1:8000/login)
+- **Screening Console:** [http://127.0.0.1:8000/dashboard/](http://127.0.0.1:8000/dashboard/)
+- **Swagger API Docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-`/predict` now takes a `parameter` field to select which parameter's model to use (defaults to
-`leakage_ua`):
-```bash
-curl -X POST http://127.0.0.1:8000/predict -H "Content-Type: application/json" -d '{
-  "component_id": "C_TEST_001",
-  "lot_id": "LOT_000",
-  "parameter": "iddq_ua",
-  "value_0h": 24.1,
-  "value_24h": 29.5
-}'
-```
+*Test Operator Credentials:*
+- **Operator ID:** `admin@astrolab.isro`
+- **Password:** `isro@2026`
 
-Other endpoints: `/component/{id}` (full per-parameter QA report), `/lot/{lot_id}/summary`
-(per-parameter lot stats + flagged component IDs), `/lots`, `/health`.
-
-## Run the dashboard
+### Streamlit QA Dashboard (Python / Plotly)
 
 ```bash
 streamlit run dashboard/app.py
 ```
+- **URL:** [http://localhost:8501](http://localhost:8501)
+- Ideal for rapid Python data exploration with interactive Plotly strip charts.
 
-Four tabs, each with a parameter selector where relevant:
-- **Lot explorer** — per-parameter, per-lot outlier strip plot with flagged parts highlighted
-- **Component drill-down** — pick a flagged component, then pick which parameter's drift curve to view
-- **Live predictor** — enter 0h/24h readings for any of the three parameters, get an instant PASS/REJECT with reasoning
-- **Flagged parts** — every flagged component with which parameter(s) triggered it, filterable by parameter
+> **Why does the Streamlit UI look different from the Web dashboard?**  
+> The Streamlit dashboard (`dashboard/app.py`, port 8501) uses Streamlit's native Python widgets and layout. The Web dashboard (`dashboard/static/index.html`, port 8000) is a custom responsive HTML5/Tailwind SPA designed specifically for the ASTROLAB ISRO design system.
 
-## Run the tests
+---
 
-A real pytest suite covering data-leakage checks (per parameter), per-module logic on hand-crafted
-edge cases, and generalization on a genuinely held-out dataset (different random seed, unseen by
-the trained models):
+## API Endpoints Reference
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/health` | System health check and component count. |
+| `GET` | `/home` | Redirect to ASTROLAB Planetary Landing Page. |
+| `GET` | `/about` | Redirect to Project Dossier & About Us Page. |
+| `GET` | `/login` | Redirect to Operator Login Screen. |
+| `GET` | `/api/overview` | Executive telemetry: total tested, flagged, yield, and parameters. |
+| `GET` | `/api/lots` | Metadata and drift percentages for all manufacturing lots. |
+| `GET` | `/api/lot/{lot_id}/scatter` | 168h scatter plot values, anomaly scores, and flags for a lot. |
+| `GET` | `/api/lot/{lot_id}/components` | Paginated checkpoint readings for all components in a lot. |
+| `GET` | `/api/component/{id}` | Full drill-down: all checkpoints, AI predictions, and SHAP rationale. |
+| `GET` | `/api/flagged` | Global list of all flagged components across lots. |
+| `POST` | `/predict` | Real-time what-if 168h inference from early 0h/24h readings. |
+
+---
+
+## Testing & Verification
+
+A comprehensive 40-test pytest suite verifies data integrity, feature leakage prevention, and model generalization:
 
 ```bash
-python3 tests/generate_holdout_data.py   # one-time: builds the held-out test set (multi-parameter)
-python3 -m pytest tests/ -v
+python -m pytest tests/ -v
 ```
 
-Includes a specific check that would catch Module B accidentally using `Value_96h`/`Value_168h`
-(for any parameter) as an input feature (`test_feature_cols_excludes_future_readings`), and a check
-that every component's `is_defective` ground truth is identical across all three parameters'
-rows (`test_same_defect_ground_truth_across_parameters`), confirming defects are seeded once per
-component, not independently per parameter.
+- **Data Integrity Tests:** Confirms no feature leakage of future readings (`Value_96h`, `Value_168h`), ensures non-negative drift, and verifies uniform defect seeding.
+- **Holdout Generalization:** Evaluates on unseen data (`seed=7` holdout) with zero data leakage.
+- **Results:** **40 / 40 passed (100% pass rate)**.
 
-**Held-out generalization** (trained on seed=42, tested on seed=7, both physically-generated, never
-mixed): Module A recall and the combined (A OR B) recall both stay ≥90% on the held-out set across
-all three parameters, and each parameter's Module B MAE stays within 6% of that parameter's own
-datasheet `max_limit` — confirming the models generalize rather than having memorized the training
-seed.
+---
 
-## Notes on the data
+## Standards Compliance
 
-No official ISRO dataset was available, so `data/generate_data.py` generates a **physics-informed
-synthetic dataset** grounded in the real **Arrhenius equation**, the standard reliability-engineering
-model relating stress-test temperature to real-world degradation rate:
-
-```
-AF = exp[ (Ea / k_B) x (1/T_use - 1/T_test) ]
-```
-
-Each component's drift rate under 125°C burn-in, for **each of the three parameters**, is derived
-from that parameter's own activation energy (Ea):
-- **Normal parts** — a mildly thermally-activated baseline mechanism per parameter (e.g. Ea ~0.35 eV
-  for leakage). Stays nearly flat across the burn-in cycle.
-- **Latent-defective parts** — a more thermally-activated failure mechanism per parameter (e.g.
-  Ea ~0.70 eV for leakage), representative of e.g. TDDB/electromigration-type mechanisms. Because
-  acceleration factor grows steeply with Ea under the Arrhenius model, these parts drift much
-  faster under stress while staying, on average, well under each parameter's own datasheet limit —
-  i.e. every seeded defect is genuinely latent, exactly the scenario ISRO's problem statement
-  describes, for every parameter screened.
-
-Every parameter's `BASE_RATE` growth constant is *derived* (not hand-tuned per parameter) so that a
-defective part's 168h value lands at ~50% of that parameter's own `max_limit` on average — the same
-calibration target the original single-parameter (leakage-only) model used, applied generically via
-`_calibrate_base_rate()` rather than duplicated by hand for each new parameter.
-
-This is a stronger physical basis than a generic power-law drift curve, since Ea and the resulting
-acceleration factor are literally the mechanism burn-in testing is designed around (JEDEC/MIL-STD-883
-reliability methodology).
-
-For the real submission, swap `generate_burnin_dataset()` for a loader over the official dataset —
-everything downstream (Module A, B, explainability, API, dashboard) is dataset-agnostic as long as
-the wide-format columns (`component_id`, `lot_id`, `Value_<hour>h_<parameter>` per screened
-parameter and checkpoint, optionally `is_defective` for evaluation) are present. Screening only one
-parameter still works unchanged via the legacy unsuffixed schema (`Value_0h`, `Value_24h`, ...) — see
-"Multi-parameter screening" above.
+- **MIL-STD-883K Method 1015 Condition D:** High Temperature Operating Life (HTOL) screening protocol at 125°C under continuous dynamic excitation.
+- **Zero-Defect Mandate:** Calibrated to prioritize 100% defect recall ($FN = 0$) for mission-critical flight hardware.

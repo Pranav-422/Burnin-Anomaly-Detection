@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>About ASTROLAB — AI-Driven Burn-In Screening</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "isro-orange": "#e87312",
+            "isro-navy": "#032848",
+            "isro-blue": "#164090",
+            "isro-cobalt": "#004079",
+            "isro-surface": "#f5fafd"
+          },
+          fontFamily: {
+            display: ["Libre Caslon Text", "serif"],
+            mono: ["Space Mono", "monospace"],
+            sans: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html, body { margin: 0; padding: 0; }
+    body { overscroll-behavior: none; }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="bg-[#f5fafd] font-sans text-[#032848] min-h-screen flex flex-col">
+
+<!-- Indian Tricolor Top Bar -->
+<div class="fixed top-0 left-0 w-full h-[3px] flex z-50">
+  <div class="h-full w-1/3 bg-[#FF9933]"></div>
+  <div class="h-full w-1/3 bg-[#FFFFFF]"></div>
+  <div class="h-full w-1/3 bg-[#138808]"></div>
+</div>
+
+<!-- Header -->
+<header class="fixed top-[3px] left-0 w-full z-40 bg-[#032848] shadow-lg border-b border-[#004079]/50">
+  <div class="h-16 w-full max-w-7xl mx-auto px-6 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a href="/dashboard/home.html" class="flex items-center gap-2.5 group">
+        <div class="w-8 h-8 rounded-lg bg-[#004079] border border-[#e87312]/60 flex items-center justify-center relative shadow-sm group-hover:border-[#e87312] transition-colors">
+          <span class="w-2 h-2 rotate-45 bg-[#e87312] absolute"></span>
+          <span class="text-white font-bold text-xs relative z-10">A</span>
+        </div>
+        <span class="font-display text-sm text-white font-bold tracking-wider">ASTROLAB</span>
+      </a>
+    </div>
+    <nav class="hidden md:flex items-center gap-8">
+      <a class="text-white/80 hover:text-[#e87312] font-mono text-[10px] font-bold uppercase tracking-widest transition-colors" href="/dashboard/home.html">Home</a>
+      <a class="text-[#e87312] font-mono text-[10px] font-bold uppercase tracking-widest border-b-2 border-[#e87312] pb-0.5" href="/dashboard/about.html">About Us</a>
+    </nav>
+    <a class="bg-[#e87312] hover:bg-[#d96509] text-white font-mono text-[10px] font-bold uppercase px-5 py-2 rounded-full transition-colors tracking-wider" href="/dashboard/login.html">Operator Login</a>
+  </div>
+</header>
+
+<main class="w-full pt-[67px] flex-1">
+
+  <!-- Mission Banner -->
+  <section class="relative bg-[#032848] text-white py-16 px-6 overflow-hidden border-b border-[#004079]">
+    <div class="absolute inset-0 opacity-15 pointer-events-none">
+      <div class="absolute -right-24 -bottom-24 w-96 h-96 rounded-full bg-[#e87312] blur-3xl"></div>
+      <div class="absolute -left-24 -top-24 w-96 h-96 rounded-full bg-[#164090] blur-3xl"></div>
+    </div>
+    
+    <div class="relative max-w-5xl mx-auto text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[#e87312] font-mono text-xs uppercase tracking-wider mb-6">
+        <span class="w-2 h-2 rounded-full bg-[#e87312] animate-pulse"></span>
+        <span>Smart India Hackathon 2026 // PS 26170</span>
+      </div>
+      <h1 class="font-display text-4xl md:text-6xl font-bold tracking-tight mb-6">
+        Project ASTROLAB
+      </h1>
+      <p class="font-sans text-lg md:text-xl text-white/85 max-w-3xl mx-auto leading-relaxed">
+        AI-Driven Multi-Parameter Anomaly Detection in Component Burn-In &amp; Screening for Zero-Defect Space Missions.
+      </p>
+      <div class="mt-8 flex items-center justify-center gap-4 text-xs font-mono text-white/60">
+        <span>ISRO, Dept. of Space</span>
+        <span>•</span>
+        <span>Team CodeWalkers</span>
+        <span>•</span>
+        <span>MIL-STD-883K Method 1015</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem & Motivation Section -->
+  <section class="max-w-5xl mx-auto px-6 py-16">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="material-symbols-outlined text-[#e87312] text-2xl">rocket_launch</span>
+      <span class="font-mono text-xs uppercase tracking-widest text-[#e87312] font-bold">The Aerospace Imperative</span>
+    </div>
+    <h2 class="font-display text-3xl md:text-4xl text-[#032848] font-bold mb-6">
+      Why Spacecraft Require Intelligent Burn-In Screening
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-[#384760] leading-relaxed">
+      <div class="bg-white p-6 rounded-xl border border-[#164090]/15 shadow-sm">
+        <div class="flex items-center gap-2 font-display text-lg text-[#032848] font-bold mb-2">
+          <span class="material-symbols-outlined text-red-500">warning</span>
+          <span>Zero Serviceability in Deep Space</span>
+        </div>
+        <p class="text-sm">
+          Unlike terrestrial electronics, a satellite orbiting Earth or en route to deep space cannot be serviced or replaced. A single latent defect in a microcontroller or power PMIC escaping quality control can precipitate catastrophic loss of a multi-crore national space mission.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl border border-[#164090]/15 shadow-sm">
+        <div class="flex items-center gap-2 font-display text-lg text-[#032848] font-bold mb-2">
+          <span class="material-symbols-outlined text-[#e87312]">speed</span>
+          <span>The Blind Spot of Static Thresholds</span>
+        </div>
+        <p class="text-sm">
+          Traditional screening applies rigid datasheet limits (e.g. max 50µA leakage). A chip that drifts rapidly from 10µA to 48µA still "passes" static gates despite severe latent degradation. Conversely, healthy chips from high-baseline manufacturing lots get wrongly scrapped.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Architecture (3 Pillars) -->
+  <section class="bg-white py-16 border-y border-[#164090]/15">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="text-center mb-12">
+        <span class="font-mono text-xs uppercase tracking-widest text-[#e87312] font-bold block mb-2">System Architecture</span>
+        <h2 class="font-display text-3xl md:text-4xl text-[#032848] font-bold">
+          The Three Pillars of ASTROLAB
+        </h2>
+        <p class="text-sm text-[#384760] max-w-2xl mx-auto mt-3">
+          Replacing static pass/fail testing with an integrated statistical, predictive, and explainable ML framework.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Pillar 1 -->
+        <div class="flex flex-col bg-[#f5fafd] p-6 rounded-xl border border-[#164090]/20 hover:border-[#e87312]/60 transition-all">
+          <div class="w-12 h-12 rounded-lg bg-[#032848] flex items-center justify-center mb-4 shadow-sm">
+            <span class="material-symbols-outlined text-[#e87312] text-2xl">radar</span>
+          </div>
+          <h3 class="font-display text-xl text-[#032848] font-bold mb-2">
+            Module A: Dynamic Lot-Relative Anomaly Detection
+          </h3>
+          <p class="text-sm text-[#384760] leading-relaxed mb-4 flex-1">
+            Evaluates each chip relative to its manufacturing lot rather than global static limits. Combines directional Interquartile Range (IQR k=2.0), lot Z-scores, and cross-parameter Isolation Forest to spot subtle multi-dimensional outliers.
+          </p>
+          <div class="text-xs font-mono text-[#004079] bg-white p-2.5 rounded border border-[#164090]/10">
+            • Directional IQR (Upper Outliers)<br/>
+            • Lot-level Z-score standardisation<br/>
+            • Joint Cross-Parameter Isolation Forest
+          </div>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="flex flex-col bg-[#f5fafd] p-6 rounded-xl border border-[#164090]/20 hover:border-[#e87312]/60 transition-all">
+          <div class="w-12 h-12 rounded-lg bg-[#032848] flex items-center justify-center mb-4 shadow-sm">
+            <span class="material-symbols-outlined text-[#e87312] text-2xl">timeline</span>
+          </div>
+          <h3 class="font-display text-xl text-[#032848] font-bold mb-2">
+            Module B: Time-Series Drift Predictor (T+24h)
+          </h3>
+          <p class="text-sm text-[#384760] leading-relaxed mb-4 flex-1">
+            XGBoost ML regressor forecasts the 168-hour end-of-test reading using early 0h and 24h readings. Calibrated with a 99.8th percentile safety slope, allowing early rejection of degraded parts at 24 hours and saving 85% in thermal chamber energy.
+          </p>
+          <div class="text-xs font-mono text-[#004079] bg-white p-2.5 rounded border border-[#164090]/10">
+            • Forecast 168h drift from 24h data<br/>
+            • 99.8th percentile safety threshold<br/>
+            • Replaces 7-day test with 24-hr decision
+          </div>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="flex flex-col bg-[#f5fafd] p-6 rounded-xl border border-[#164090]/20 hover:border-[#e87312]/60 transition-all">
+          <div class="w-12 h-12 rounded-lg bg-[#032848] flex items-center justify-center mb-4 shadow-sm">
+            <span class="material-symbols-outlined text-[#e87312] text-2xl">psychology</span>
+          </div>
+          <h3 class="font-display text-xl text-[#032848] font-bold mb-2">
+            Explainability Layer: SHAP Decision Audits
+          </h3>
+          <p class="text-sm text-[#384760] leading-relaxed mb-4 flex-1">
+            Aerospace quality control mandates total explainability. ASTROLAB computes SHAP contribution values for every prediction, producing human-readable explanations that detail which electrical parameter drove the flag and by how much.
+          </p>
+          <div class="text-xs font-mono text-[#004079] bg-white p-2.5 rounded border border-[#164090]/10">
+            • Exact SHAP feature contributions<br/>
+            • Plain-language QA audit text<br/>
+            • Full inspector traceability log
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Multi-Parameter Screening Matrix -->
+  <section class="max-w-5xl mx-auto px-6 py-16">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="material-symbols-outlined text-[#e87312] text-2xl">vital_signs</span>
+      <span class="font-mono text-xs uppercase tracking-widest text-[#e87312] font-bold">Electrical Telemetry</span>
+    </div>
+    <h2 class="font-display text-3xl text-[#032848] font-bold mb-6">
+      Screened Electrical Parameters
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-5 rounded-xl border border-[#164090]/15">
+        <div class="font-mono text-xs text-[#e87312] font-bold uppercase mb-1">Parameter 01</div>
+        <h4 class="font-display text-lg font-bold text-[#032848] mb-1">Leakage Current (I_leak)</h4>
+        <div class="font-mono text-xs text-[#004079] mb-3">Unit: Microamperes (µA)</div>
+        <p class="text-xs text-[#384760] leading-relaxed">
+          Measures reverse-bias and dielectric leakage across oxide layers. Exponential degradation under high temperature indicates impending gate-oxide breakdown.
+        </p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-[#164090]/15">
+        <div class="font-mono text-xs text-[#e87312] font-bold uppercase mb-1">Parameter 02</div>
+        <h4 class="font-display text-lg font-bold text-[#032848] mb-1">Quiescent Supply (Iddq)</h4>
+        <div class="font-mono text-xs text-[#004079] mb-3">Unit: Microamperes (µA)</div>
+        <p class="text-xs text-[#384760] leading-relaxed">
+          Standby supply current when CMOS gates are quiescent. Uniquely sensitive to bridging faults, gate punch-through, and micro-cracks inside silicon dice.
+        </p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-[#164090]/15">
+        <div class="font-mono text-xs text-[#e87312] font-bold uppercase mb-1">Parameter 03</div>
+        <h4 class="font-display text-lg font-bold text-[#032848] mb-1">Propagation Delay (t_pd)</h4>
+        <div class="font-mono text-xs text-[#004079] mb-3">Unit: Nanoseconds (ns)</div>
+        <p class="text-xs text-[#384760] leading-relaxed">
+          Gate switching delay across critical logic paths. Hot carrier injection and negative-bias temperature instability (NBTI) degrade transition times over burn-in duration.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Standards & Compliance -->
+  <section class="bg-[#032848] text-white py-14 px-6 border-t border-[#004079]">
+    <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+      <div class="flex items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-[#e87312]/20 border border-[#e87312]/50 flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[#e87312] text-3xl">verified</span>
+        </div>
+        <div>
+          <h3 class="font-display text-2xl font-bold mb-1">MIL-STD-883K Method 1015 Condition D</h3>
+          <p class="text-sm text-white/70">
+            High Temperature Operating Life (HTOL) screening at 125°C under continuous dynamic electrical excitation.
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 shrink-0">
+        <a class="bg-[#e87312] hover:bg-[#d96509] text-white font-mono text-xs uppercase px-6 py-3 rounded-full font-bold tracking-wider transition-colors flex items-center gap-2" href="/dashboard/login.html">
+          <span>Access Console</span>
+          <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Information -->
+  <section class="max-w-5xl mx-auto px-6 py-16">
+    <div class="text-center mb-8">
+      <span class="font-mono text-xs uppercase tracking-widest text-[#e87312] font-bold block mb-2">Engineering Team</span>
+      <h2 class="font-display text-3xl text-[#032848] font-bold">
+        Developed by Team CodeWalkers
+      </h2>
+      <p class="text-sm text-[#384760] mt-2">
+        Smart India Hackathon 2026 · Problem Statement 26170 · ISRO, Department of Space
+      </p>
+    </div>
+
+    <div class="bg-white p-8 rounded-2xl border border-[#164090]/15 shadow-sm max-w-2xl mx-auto text-center">
+      <div class="w-16 h-16 rounded-full bg-[#032848] text-[#e87312] flex items-center justify-center mx-auto mb-4 text-2xl font-display font-bold border-2 border-[#e87312]">
+        CW
+      </div>
+      <h3 class="font-display text-xl text-[#032848] font-bold mb-1">Team CodeWalkers</h3>
+      <p class="font-mono text-xs text-[#e87312] uppercase tracking-wider mb-4">Space Systems &amp; Applied AI Division</p>
+      <p class="text-sm text-[#384760] leading-relaxed mb-6">
+        Dedicated to bringing predictive statistical learning and explainable machine intelligence to mission-critical aerospace quality assurance.
+      </p>
+      <div class="flex items-center justify-center gap-4">
+        <a href="/dashboard/home.html" class="px-5 py-2 rounded-lg bg-surface-container-high text-[#032848] hover:bg-[#032848] hover:text-white transition-all text-xs font-mono font-bold uppercase tracking-wider">
+          Planetary Home
+        </a>
+        <a href="/dashboard/login.html" class="px-5 py-2 rounded-lg bg-[#e87312] text-white hover:bg-[#d96509] transition-all text-xs font-mono font-bold uppercase tracking-wider">
+          Operator Console
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="w-full bg-[#032848] border-t border-[#004079]">
+  <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+    <span class="font-mono text-[10px] text-white/50 uppercase tracking-wider">© 2026 ASTROLAB · ISRO Dept. of Space · Team CodeWalkers</span>
+    <div class="flex items-center gap-6">
+      <a class="font-mono text-[10px] text-white/50 hover:text-[#e87312] transition-colors uppercase tracking-wider" href="/dashboard/home.html">Home</a>
+      <a class="font-mono text-[10px] text-[#e87312] transition-colors uppercase tracking-wider" href="/dashboard/about.html">About Us</a>
+      <a class="font-mono text-[10px] text-white/50 hover:text-[#e87312] transition-colors uppercase tracking-wider" href="/dashboard/login.html">Login</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
