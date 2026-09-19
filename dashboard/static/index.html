@@ -1237,7 +1237,19 @@ document.addEventListener('click', (e) => {
 });
 
 // ==================== UTILS ====================
-function exportReport() { alert('Export functionality would generate PDF/CSV report from API data.'); }
+function exportReport() {
+  const btn = document.querySelector('[onclick="exportReport()"]');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<div class="loading-spinner" style="width:16px;height:16px;border-width:2px;"></div><span>Downloading…</span>'; }
+  const a = document.createElement('a');
+  a.href = `${API_BASE}/api/export/report`;
+  a.download = 'ASTROLAB_BurnIn_Screening_Report.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">download</span><span>Export</span>'; }
+  }, 2000);
+}
 
 // ==================== INIT ====================
 window.addEventListener('DOMContentLoaded', () => {

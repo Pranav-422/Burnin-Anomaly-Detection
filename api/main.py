@@ -199,6 +199,20 @@ def api_workflow_image():
     raise HTTPException(status_code=404, detail="Workflow image not found")
 
 
+@app.get("/api/export/report")
+@app.get("/api/export")
+def api_export_report():
+    """Serves the final burn-in screening report CSV for direct download."""
+    csv_path = os.path.join(OUTPUTS_DIR, "final_report.csv")
+    if os.path.isfile(csv_path):
+        return FileResponse(
+            path=csv_path,
+            filename="ASTROLAB_BurnIn_Screening_Report.csv",
+            media_type="text/csv",
+        )
+    raise HTTPException(status_code=404, detail="Screening report file not found.")
+
+
 @app.get("/api/lots")
 def api_lots():
     """Returns all lots with summary metadata for the lots table."""

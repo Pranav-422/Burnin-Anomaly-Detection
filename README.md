@@ -151,6 +151,8 @@ streamlit run dashboard/app.py
 | `GET` | `/api/lot/{lot_id}/components` | Paginated checkpoint readings for all components in a lot. |
 | `GET` | `/api/component/{id}` | Full drill-down: all checkpoints, AI predictions, and SHAP rationale. |
 | `GET` | `/api/flagged` | Global list of all flagged components across lots. |
+| `GET` | `/api/export/report` | Download the full screening report as CSV. |
+| `GET` | `/api/workflow-image` | Serves the screening architecture workflow diagram (PNG). |
 | `POST` | `/predict` | Real-time what-if 168h inference from early 0h/24h readings. |
 
 ---
