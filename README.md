@@ -68,8 +68,7 @@ burnin-anomaly-detection/
 ├── api/
 │   └── main.py                   # FastAPI application + static web dashboard mount + REST endpoints
 ├── dashboard/
-│   ├── app.py                    # Streamlit QA dashboard (port 8501, Python + Plotly)
-│   └── static/                   # ASTROLAB Web Portal (port 8000)
+│   └── static/                   # ASTROLAB Web Portal (HTML5 / Tailwind CSS / Vanilla JS)
 │       ├── home.html             # Planetary Landing Page
 │       ├── about.html            # Mission Dossier & Architecture Page
 │       ├── login.html            # Operator Authentication Screen (Hardened)
@@ -107,33 +106,20 @@ Outputs created in `outputs/`:
 
 ---
 
-## Running the Interfaces
-
-### Modern Web Portal & Screening Console (FastAPI) — Recommended
+## Running the ASTROLAB Web Portal
 
 ```bash
 uvicorn api.main:app --reload --port 8000
 ```
 - **Landing Page:** [http://127.0.0.1:8000/home](http://127.0.0.1:8000/home)
-- **About Us:** [http://127.0.0.1:8000/about](http://127.0.0.1:8000/about)
+- **About Us Dossier:** [http://127.0.0.1:8000/about](http://127.0.0.1:8000/about)
 - **Operator Login:** [http://127.0.0.1:8000/login](http://127.0.0.1:8000/login)
 - **Screening Console:** [http://127.0.0.1:8000/dashboard/](http://127.0.0.1:8000/dashboard/)
-- **Swagger API Docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **Interactive Swagger API Docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 *Test Operator Credentials:*
 - **Operator ID:** `admin@astrolab.isro`
 - **Password:** `isro@2026`
-
-### Streamlit QA Dashboard (Python / Plotly)
-
-```bash
-streamlit run dashboard/app.py
-```
-- **URL:** [http://localhost:8501](http://localhost:8501)
-- Ideal for rapid Python data exploration with interactive Plotly strip charts.
-
-> **Why does the Streamlit UI look different from the Web dashboard?**  
-> The Streamlit dashboard (`dashboard/app.py`, port 8501) uses Streamlit's native Python widgets and layout. The Web dashboard (`dashboard/static/index.html`, port 8000) is a custom responsive HTML5/Tailwind SPA designed specifically for the ASTROLAB ISRO design system.
 
 ---
 
